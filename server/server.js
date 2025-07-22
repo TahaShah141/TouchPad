@@ -13,8 +13,8 @@ wss.on('connection', (ws) => {
   ws.on('message', (message) => {
     try {
       const data = JSON.parse(message);
-      if (data.type !== 'mousemove' && data.type !== 'scroll' && data.type !== 'threefingerdrag') 
-        console.log({type: data.type});
+      // if (data.type !== 'mousemove' && data.type !== 'scroll' && data.type !== 'threefingerdrag') 
+      //   console.log({type: data.type});
 
       if (data.type === 'mousemove') {
         const { dx, dy } = data;
@@ -41,7 +41,7 @@ wss.on('connection', (ws) => {
         robot.scrollMouse(dx, dy);
       } else if (data.type === 'spacechange') {
         const { direction } = data;
-        console.log({ direction }) 
+        // console.log({ direction }) 
         triggerMissionControl(direction)
       }
     } catch (error) {
