@@ -18,7 +18,12 @@ wss.on('connection', (ws) => {
         if (dx === undefined || dy === undefined) return;
         const { x, y } = robot.getMousePos();
         robot.moveMouse(x + dx, y + dy);
-      } else if (data.type === 'scroll') {
+      } else if (data.type === 'click') {
+        robot.mouseClick();
+      } else if (data.type === 'rightclick') {
+        robot.mouseClick('right');
+      }
+      else if (data.type === 'scroll') {
         const { dx, dy } = data;
         robot.scrollMouse(dx, dy);
       }

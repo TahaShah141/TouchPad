@@ -14,6 +14,10 @@ export default function Index() {
   const [isConnected, setIsConnected] = useState(false);
   const [orientation, setOrientation] = useState(ScreenOrientation.Orientation.PORTRAIT_UP);
   const isWsConnected = useSharedValue(false);
+  const prevPanX = useSharedValue(0);
+  const prevPanY = useSharedValue(0);
+  const prevTwoFingerPanX = useSharedValue(0);
+  const prevTwoFingerPanY = useSharedValue(0);
   const ws = useRef<WebSocket | null>(null);
 
   const connectWebSocket = () => {
@@ -116,16 +120,28 @@ export default function Index() {
     return () => {
       ScreenOrientation.removeOrientationChangeListeners();
     };
-  }, []);;
+  }, []);
 
-  const SENSITIVITY_FACTOR = 0.15; // Adjust this value as needed
+  const SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed
+  const SCROLL_SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed for scrolling
 
   const sendMessage = (message: { type: string; dx?: number; dy?: number; }) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      let finalDx = message.dx;
+      let finalDy = message.dy;
+
+      if (message.type === 'mousemove') {
+        finalDx = message.dx ? message.dx * SENSITIVITY_FACTOR : undefined;
+        finalDy = message.dy ? message.dy * SENSITIVITY_FACTOR : undefined;
+      } else if (message.type === 'scroll') {
+        finalDx = message.dx ? message.dx * SCROLL_SENSITIVITY_FACTOR : undefined;
+        finalDy = message.dy ? message.dy * SCROLL_SENSITIVITY_FACTOR : undefined;
+      }
+
       const scaledMessage = {
         ...message,
-        dx: message.dx ? message.dx * SENSITIVITY_FACTOR : undefined,
-        dy: message.dy ? message.dy * SENSITIVITY_FACTOR : undefined,
+        dx: finalDx,
+        dy: finalDy,
       };
       ws.current.send(JSON.stringify(scaledMessage));
     } else {
@@ -134,17 +150,23 @@ export default function Index() {
   };
 
   const panGesture = Gesture.Pan()
+    .minPointers(1)
+    .maxPointers(1)
     .onStart((e) => {
-      // No action needed on start for continuous movement
+      prevPanX.value = e.translationX;
+      prevPanY.value = e.translationY;
     })
     .onUpdate((e) => {
       if (isWsConnected.value) {
-        let dx = e.translationX;
-        let dy = e.translationY;
+        let dx = e.translationX - prevPanX.value;
+        let dy = e.translationY - prevPanY.value;
+
+        prevPanX.value = e.translationX;
+        prevPanY.value = e.translationY;
 
         // Adjust dx and dy based on current orientation
         if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP) {
-          [dx, dy] = [dy, -dx]
+          [dx, dy] = [dy, -dx];
         }
 
         runOnJS(sendMessage)({
@@ -159,9 +181,69 @@ export default function Index() {
       // No action needed on end for continuous movement
     });
 
+  const tapGesture = Gesture.Tap()
+    .minPointers(1)
+    .maxDuration(250) // Maximum duration for a tap (in milliseconds)
+    .maxDeltaX(5)    // Maximum horizontal movement for a tap
+    .maxDeltaY(5)    // Maximum vertical movement for a tap
+    .onEnd(() => {
+      if (isWsConnected.value) {
+        runOnJS(sendMessage)({
+          type: 'click',
+        });
+      }
+    });
+
+  const twoFingerTapGesture = Gesture.Tap()
+    .minPointers(2)
+    .maxDuration(250)
+    .maxDeltaX(10)
+    .maxDeltaY(10)
+    .onEnd(() => {
+      if (isWsConnected.value) {
+        runOnJS(sendMessage)({
+          type: 'rightclick',
+        });
+      }
+    });
+
+  const twoFingerPanGesture = Gesture.Pan()
+    .minPointers(2)
+    .maxPointers(2)
+    .onStart((e) => {
+      prevTwoFingerPanX.value = e.translationX;
+      prevTwoFingerPanY.value = e.translationY;
+    })
+    .onUpdate((e) => {
+      if (isWsConnected.value) {
+        let dx = e.translationX - prevTwoFingerPanX.value;
+        let dy = e.translationY - prevTwoFingerPanY.value;
+
+        prevTwoFingerPanX.value = e.translationX;
+        prevTwoFingerPanY.value = e.translationY;
+
+        // Adjust dx and dy based on current orientation
+        if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP) {
+          [dx, dy] = [dy, -dx];
+        }
+
+        runOnJS(sendMessage)({
+          type: 'scroll',
+          dx: dx,
+          dy: dy,
+        });
+      } else {
+      }
+    })
+    .onEnd(() => {
+      // No action needed on end for continuous movement
+    });
+
+  const composedGesture = Gesture.Simultaneous(panGesture, tapGesture, twoFingerTapGesture, twoFingerPanGesture);
+
   return (
     <View className="flex-1 bg-gray-900">
-      <GestureDetector gesture={panGesture}>
+      <GestureDetector gesture={composedGesture}>
         <View className="flex-1 m-4 rounded-3xl bg-gray-800 shadow-lg">
         </View>
       </GestureDetector>
