@@ -1,116 +1,27 @@
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from 'react';
+import { Text, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { runOnJS, useSharedValue } from 'react-native-reanimated';
 
-import { getMacIP } from "@/lib/utils";
+import { doubleClickGesture } from '@/gestures/doubleClickGesture';
+import { fourFingerSwipeGesture } from '@/gestures/fourFingerSwipeGesture';
+import { leftClickGesture } from '@/gestures/leftClickGesture';
+import { mouseMoveGesture } from '@/gestures/mouseMoveGesture';
+import { rightClickGesture } from '@/gestures/rightClickGesture';
+import { scrollGesture } from '@/gestures/scrollGesture';
+import { useWebSocket } from '@/lib/useWebSocket';
+import { sendMessageWrapper } from "@/lib/utils";
 import { MaterialIcons } from '@expo/vector-icons';
+import { useSharedValue } from 'react-native-reanimated';
 
 export default function Index() {
-  const [ipAddress, setIpAddress] = useState("");
-  const PORT = '2025'
-  const [isConnected, setIsConnected] = useState(false);
+  const { isConnected, connectWebSocket, ws, isWsConnected } = useWebSocket();
   const [orientation, setOrientation] = useState(ScreenOrientation.Orientation.PORTRAIT_UP);
-  const isWsConnected = useSharedValue(false);
   const prevPanX = useSharedValue(0);
   const prevPanY = useSharedValue(0);
   const prevTwoFingerPanX = useSharedValue(0);
   const prevTwoFingerPanY = useSharedValue(0);
-  const ws = useRef<WebSocket | null>(null);
-
-  const connectWebSocket = () => {
-    console.log('Attempting to connectWebSocket...');
-    if (!ipAddress) {
-      console.log("IP address not available yet. Cannot connect.");
-      return;
-    }
-    
-    if (ws.current) {
-      console.log('Closing existing WebSocket connection.');
-      ws.current.close();
-    }
-
-    console.log(`Initiating connection to ws://${ipAddress}:${PORT}`);
-    const socket = new WebSocket(`ws://${ipAddress}:${PORT}`);
-
-    socket.onopen = () => {
-      setIsConnected(true);
-      isWsConnected.value = true;
-      ws.current = socket;
-    };
-
-    socket.onmessage = (event) => {
-      console.log('Received message from server:', event.data);
-    };
-
-    socket.onerror = (error) => {
-      console.error('WebSocket Error during connection:', error);
-      setIsConnected(false);
-      isWsConnected.value = false;
-      console.log('WebSocket connection error. ws.current:', ws.current);
-    };
-
-    socket.onclose = () => {
-            setIsConnected(false);
-            isWsConnected.value = false;
-            ws.current = null;
-            console.log('WebSocket disconnected.');
-            console.log('ws.current set to null on close.');
-          };
-  };
-
-  useEffect(() => {
-    let currentWs = ws.current; // Capture current ref value for cleanup
-
-    const setupAndConnect = async () => {
-      try {
-        const ip = await getMacIP();
-        if (ip) {
-          setIpAddress(ip);
-
-          // Attempt to connect WebSocket
-          // Close existing connection before opening a new one
-          if (currentWs) {
-            currentWs.close();
-          }
-
-          const socket = new WebSocket(`ws://${ip}:2025`);
-
-          socket.onopen = () => {
-            setIsConnected(true);
-            isWsConnected.value = true;
-            ws.current = socket; // Assign here
-          };
-
-          socket.onmessage = (event) => {
-          };
-
-          socket.onerror = (error) => {
-            setIsConnected(false); // Ensure state is updated on error
-            isWsConnected.value = false;
-          };
-
-          socket.onclose = () => {
-            setIsConnected(false);
-            isWsConnected.value = false;
-            ws.current = null;
-          };
-        } else {
-        }
-      } catch (e) {
-      }
-    };
-    setupAndConnect();
-
-    // Cleanup on unmount
-    return () => {
-      if (currentWs) {
-        currentWs.close();
-      }
-    };
-  }, []); // Empty dependency array means this runs once on mount
 
   useEffect(() => {
     const subscription = ScreenOrientation.addOrientationChangeListener((event) => {
@@ -122,187 +33,53 @@ export default function Index() {
     };
   }, []);
 
-  const SENSITIVITY_FACTOR = 3; // Adjust this value as needed
-  const SCROLL_SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed for scrolling
+  const sendMessage = sendMessageWrapper(ws)
 
-  const sendMessage = (message: { type: string; dx?: number; dy?: number; direction?: 'up' | 'down' | 'left' | 'right' }) => {
-    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      let finalDx = message.dx;
-      let finalDy = message.dy;
-
-      if (message.type === 'mousemove') {
-        finalDx = message.dx ? message.dx * SENSITIVITY_FACTOR : undefined;
-        finalDy = message.dy ? message.dy * SENSITIVITY_FACTOR : undefined;
-      } else if (message.type === 'scroll') {
-        finalDx = message.dx ? message.dx * SCROLL_SENSITIVITY_FACTOR : undefined;
-        finalDy = message.dy ? message.dy * SCROLL_SENSITIVITY_FACTOR : undefined;
-      }
-
-      const scaledMessage = {
-        ...message,
-        dx: finalDx,
-        dy: finalDy,
-      };
-      ws.current.send(JSON.stringify(scaledMessage));
-    } else {
-      console.log('WebSocket not open. Current state:', ws.current?.readyState);
-    }
-  };
-
-  const mouseMoveGesture = Gesture.Pan()
-    .minPointers(1)
-    .maxPointers(1)
-    .onStart((e) => {
-      prevPanX.value = e.translationX;
-      prevPanY.value = e.translationY;
-    })
-    .onUpdate((e) => {
-      if (isWsConnected.value) {
-        let dx = e.translationX - prevPanX.value;
-        let dy = e.translationY - prevPanY.value;
-
-        prevPanX.value = e.translationX;
-        prevPanY.value = e.translationY;
-
-        // Adjust dx and dy based on current orientation
-        if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP) {
-          [dx, dy] = [dy, -dx];
-        }
-
-        runOnJS(sendMessage)({
-          type: 'mousemove',
-          dx: dx,
-          dy: dy,
-        });
-      }
+  useEffect(() => {
+    const subscription = ScreenOrientation.addOrientationChangeListener((event) => {
+      setOrientation(event.orientationInfo.orientation);
     });
 
-  const scrollGesture = Gesture.Pan()
-    .minPointers(2)
-    .maxPointers(2)
-    .onStart((e) => {
-      prevTwoFingerPanX.value = e.translationX;
-      prevTwoFingerPanY.value = e.translationY;
-    })
-    .onUpdate((e) => {
-      if (isWsConnected.value) {
-        let dx = e.translationX - prevTwoFingerPanX.value;
-        let dy = e.translationY - prevTwoFingerPanY.value;
-
-        prevTwoFingerPanX.value = e.translationX;
-        prevTwoFingerPanY.value = e.translationY;
-
-        // Adjust dx and dy based on current orientation
-        if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP) {
-          [dx, dy] = [dy, -dx];
-        }
-
-        runOnJS(sendMessage)({
-          type: 'scroll',
-          dx: dx,
-          dy: dy,
-        });
-      }
-    });
-
-  const fourFingerSwipeGesture = Gesture.Pan()
-    .minPointers(4)
-    .maxPointers(4)
-    .onEnd((e) => {
-      if (isWsConnected.value) {
-        const { translationX, translationY } = e;
-        const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe to be recognized
-
-        if (Math.abs(translationX) > Math.abs(translationY)) {
-          // Horizontal swipe on device -> Vertical space change
-          if (translationX > SWIPE_THRESHOLD) {
-            runOnJS(sendMessage)({
-              type: 'spacechange',
-              direction: 'up',
-            });
-          } else if (translationX < -SWIPE_THRESHOLD) {
-            runOnJS(sendMessage)({
-              type: 'spacechange',
-              direction: 'down',
-            });
-          }
-        } else {
-          // Vertical swipe on device -> Horizontal space change
-          if (translationY > SWIPE_THRESHOLD) {
-            runOnJS(sendMessage)({
-              type: 'spacechange',
-              direction: 'left',
-            });
-          } else if (translationY < -SWIPE_THRESHOLD) {
-            runOnJS(sendMessage)({
-              type: 'spacechange',
-              direction: 'right',
-            });
-          }
-        }
-      }
-    });
-
-  const doubleClickGesture = Gesture.Tap()
-    .minPointers(3)
-    .maxDuration(250)
-    .maxDelay(300)
-    .onEnd(() => {
-      if (isWsConnected.value) {
-        runOnJS(sendMessage)({
-          type: 'doubleclick',
-        });
-      }
-    });
-
-  const leftClickGesture = Gesture.Tap()
-    .maxDuration(250)
-    .maxDeltaX(5)
-    .maxDeltaY(5)
-    .onEnd(() => {
-      if (isWsConnected.value) {
-        runOnJS(sendMessage)({
-          type: 'click',
-        });
-      }
-    });
-
-  const rightClickGesture = Gesture.Tap()
-    .minPointers(2)
-    .maxDuration(250)
-    .maxDeltaX(10)
-    .maxDeltaY(10)
-    .onEnd(() => {
-      if (isWsConnected.value) {
-        runOnJS(sendMessage)({
-          type: 'rightclick',
-        });
-      }
-    });
+    return () => {
+      ScreenOrientation.removeOrientationChangeListeners();
+    };
+  }, []);
 
   const composedGesture = Gesture.Race(
-    doubleClickGesture,
-    rightClickGesture,
-    leftClickGesture,
-    fourFingerSwipeGesture,
-    mouseMoveGesture,
-    scrollGesture
+    doubleClickGesture(isWsConnected, sendMessage),
+    rightClickGesture(isWsConnected, sendMessage),
+    leftClickGesture(isWsConnected, sendMessage),
+    fourFingerSwipeGesture(isWsConnected, sendMessage),
+    mouseMoveGesture(isWsConnected, prevPanX, prevPanY, orientation, sendMessage),
+    scrollGesture(isWsConnected, prevTwoFingerPanX, prevTwoFingerPanY, orientation, sendMessage)
   );
 
   return (
-    <View className="flex-1 bg-gray-900">
+    <View className="flex-1 bg-neutral-900">
       <GestureDetector gesture={composedGesture}>
-        <View className="flex-1 m-4 rounded-3xl bg-gray-800 shadow-lg">
+        <View className="flex-1 m-4 rounded-3xl bg-neutral-800 shadow-lg">
         </View>
       </GestureDetector>
       
       {/* Reconnect Button */}
-      <TouchableOpacity
-        className={`absolute top-16 right-5 w-14 h-14 rounded-full justify-center items-center ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
-        onPress={connectWebSocket}
-      >
-        <MaterialIcons name="refresh" size={32} color="white" />
-      </TouchableOpacity>
+      {!isConnected && (
+        <View className="absolute inset-0 bg-black/20 justify-center items-center">
+          <View className="bg-neutral-900 mx-8 rounded-xl p-6 border border-neutral-700">
+            <MaterialIcons name="wifi-off" size={48} color="#d4d4d4" className="self-center mb-4" />
+            <Text className="text-neutral-300 text-center mb-4">
+              Connection Lost
+            </Text>
+            <TouchableOpacity
+              className="bg-neutral-700 rounded-lg py-3 px-6"
+              onPress={connectWebSocket}
+            >
+              <Text className="text-neutral-200 text-center">
+                Reconnect
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 }

@@ -1,9 +1,10 @@
+import { SharedValue, runOnJS } from 'react-native-reanimated';
+
 import { Gesture } from 'react-native-gesture-handler';
-import { runOnJS, SharedValue } from 'react-native-reanimated';
 
 export const fourFingerSwipeGesture = (
   isWsConnected: SharedValue<boolean>,
-  sendMessage: (message: { type: string; direction: string; }) => void
+  sendMessage: (message: { type: string; direction?: 'up' | 'down' | 'left' | 'right' }) => void
 ) =>
   Gesture.Pan()
     .minPointers(4)
@@ -31,12 +32,12 @@ export const fourFingerSwipeGesture = (
           if (translationY > SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: 'right',
+              direction: 'left',
             });
           } else if (translationY < -SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: 'left',
+              direction: 'right',
             });
           }
         }
