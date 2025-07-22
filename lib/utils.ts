@@ -13,7 +13,7 @@ const SENSITIVITY_FACTOR = 3; // Adjust this value as needed
 const SCROLL_SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed for scrolling
 
 export const sendMessageWrapper = (ws: React.RefObject<WebSocket | null>) => 
-(message: { type: string; dx?: number; dy?: number; direction?: 'up' | 'down' | 'left' | 'right' }) => {
+(message: { type: string; dx?: number; dy?: number; direction?: 'up' | 'down' | 'left' | 'right' ; msg?: string}) => {
   if (ws.current && ws.current.readyState === WebSocket.OPEN) {
     let finalDx = message.dx;
     let finalDy = message.dy;

@@ -16,7 +16,9 @@ wss.on('connection', (ws) => {
       // if (data.type !== 'mousemove' && data.type !== 'scroll' && data.type !== 'threefingerdrag') 
       //   console.log({type: data.type});
 
-      if (data.type === 'mousemove') {
+      if (data.type === 'echo') {
+        console.log(data.msg) 
+      } else if (data.type === 'mousemove') {
         const { dx, dy } = data;
         if (dx === undefined || dy === undefined) return;
         const { x, y } = robot.getMousePos();

@@ -6,6 +6,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { doubleClickGesture } from '@/gestures/doubleClickGesture';
 import { fourFingerSwipeGesture } from '@/gestures/fourFingerSwipeGesture';
+import { fourFingerTapGesture } from '@/gestures/fourFingerTapGesture';
 import { leftClickGesture } from '@/gestures/leftClickGesture';
 import { mouseMoveGesture } from '@/gestures/mouseMoveGesture';
 import { rightClickGesture } from '@/gestures/rightClickGesture';
@@ -47,13 +48,14 @@ export default function Index() {
   }, []);
 
   const composedGesture = Gesture.Race(
+    fourFingerTapGesture(isWsConnected, sendMessage),
     doubleClickGesture(isWsConnected, sendMessage),
     rightClickGesture(isWsConnected, sendMessage),
     leftClickGesture(isWsConnected, sendMessage),
     fourFingerSwipeGesture(isWsConnected, sendMessage),
     mouseMoveGesture(isWsConnected, prevPanX, prevPanY, orientation, sendMessage),
     scrollGesture(isWsConnected, prevTwoFingerPanX, prevTwoFingerPanY, orientation, sendMessage),
-    threeFingerDragGesture(isWsConnected, prevPanX, prevPanY, orientation, sendMessage)
+    threeFingerDragGesture(isWsConnected, prevPanX, prevPanY, orientation, sendMessage),
   );
 
   return (
