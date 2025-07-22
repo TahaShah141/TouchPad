@@ -1,12 +1,12 @@
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, View } from "react-native";
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 
-import { MaterialIcons } from '@expo/vector-icons';
 import { getMacIP } from "@/lib/utils";
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Index() {
   const [ipAddress, setIpAddress] = useState("");
@@ -122,7 +122,7 @@ export default function Index() {
     };
   }, []);
 
-  const SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed
+  const SENSITIVITY_FACTOR = 3; // Adjust this value as needed
   const SCROLL_SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed for scrolling
 
   const sendMessage = (message: { type: string; dx?: number; dy?: number; }) => {
@@ -174,36 +174,6 @@ export default function Index() {
           dx: dx,
           dy: dy,
         });
-      } else {
-      }
-    })
-    .onEnd(() => {
-      // No action needed on end for continuous movement
-    });
-
-  const tapGesture = Gesture.Tap()
-    .minPointers(1)
-    .maxDuration(250) // Maximum duration for a tap (in milliseconds)
-    .maxDeltaX(5)    // Maximum horizontal movement for a tap
-    .maxDeltaY(5)    // Maximum vertical movement for a tap
-    .onEnd(() => {
-      if (isWsConnected.value) {
-        runOnJS(sendMessage)({
-          type: 'click',
-        });
-      }
-    });
-
-  const twoFingerTapGesture = Gesture.Tap()
-    .minPointers(2)
-    .maxDuration(250)
-    .maxDeltaX(10)
-    .maxDeltaY(10)
-    .onEnd(() => {
-      if (isWsConnected.value) {
-        runOnJS(sendMessage)({
-          type: 'rightclick',
-        });
       }
     });
 
@@ -232,18 +202,13 @@ export default function Index() {
           dx: dx,
           dy: dy,
         });
-      } else {
       }
-    })
-    .onEnd(() => {
-      // No action needed on end for continuous movement
     });
 
   const doubleTapGesture = Gesture.Tap()
     .minPointers(3)
     .maxDuration(250)
-    .maxDeltaX(5)
-    .maxDeltaY(5)
+    .maxDelay(300)
     .onEnd(() => {
       if (isWsConnected.value) {
         runOnJS(sendMessage)({
@@ -252,7 +217,38 @@ export default function Index() {
       }
     });
 
-  const composedGesture = Gesture.Simultaneous(panGesture, tapGesture, twoFingerTapGesture, twoFingerPanGesture, doubleTapGesture);
+  const singleTapGesture = Gesture.Tap()
+    .maxDuration(250)
+    .maxDeltaX(5)
+    .maxDeltaY(5)
+    .onEnd(() => {
+      if (isWsConnected.value) {
+        runOnJS(sendMessage)({
+          type: 'click',
+        });
+      }
+    });
+
+  const twoFingerTapGesture = Gesture.Tap()
+    .minPointers(2)
+    .maxDuration(250)
+    .maxDeltaX(10)
+    .maxDeltaY(10)
+    .onEnd(() => {
+      if (isWsConnected.value) {
+        runOnJS(sendMessage)({
+          type: 'rightclick',
+        });
+      }
+    });
+
+  const composedGesture = Gesture.Race(
+    doubleTapGesture,
+    twoFingerTapGesture,
+    singleTapGesture,
+    panGesture,
+    twoFingerPanGesture
+  );
 
   return (
     <View className="flex-1 bg-gray-900">

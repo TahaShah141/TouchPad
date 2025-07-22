@@ -24,8 +24,9 @@ wss.on('connection', (ws) => {
         robot.mouseClick();
       } else if (data.type === 'rightclick') {
         robot.mouseClick('right');
-      }
-      else if (data.type === 'scroll') {
+      } else if (data.type === 'doubleclick') {
+        robot.mouseClick('left', true)
+      } else if (data.type === 'scroll') {
         const { dx, dy } = data;
         robot.scrollMouse(dx, dy);
       }
