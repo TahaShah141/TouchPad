@@ -1,6 +1,7 @@
 
 const WebSocket = require('ws');
 const robot = require('robotjs');
+const { triggerMissionControl } = require('./utils');
 
 const wss = new WebSocket.Server({ port: 2025 });
 
@@ -29,6 +30,10 @@ wss.on('connection', (ws) => {
       } else if (data.type === 'scroll') {
         const { dx, dy } = data;
         robot.scrollMouse(dx, dy);
+      } else if (data.type === 'spacechange') {
+        const { direction } = data;
+        console.log({ direction }) 
+        triggerMissionControl(direction)
       }
     } catch (error) {
       console.error('Failed to parse message or execute action:', error);

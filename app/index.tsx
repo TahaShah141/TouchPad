@@ -125,7 +125,7 @@ export default function Index() {
   const SENSITIVITY_FACTOR = 3; // Adjust this value as needed
   const SCROLL_SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed for scrolling
 
-  const sendMessage = (message: { type: string; dx?: number; dy?: number; }) => {
+  const sendMessage = (message: { type: string; dx?: number; dy?: number; direction?: 'up' | 'down' | 'left' | 'right' }) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       let finalDx = message.dx;
       let finalDy = message.dy;
@@ -149,7 +149,7 @@ export default function Index() {
     }
   };
 
-  const panGesture = Gesture.Pan()
+  const mouseMoveGesture = Gesture.Pan()
     .minPointers(1)
     .maxPointers(1)
     .onStart((e) => {
@@ -177,7 +177,7 @@ export default function Index() {
       }
     });
 
-  const twoFingerPanGesture = Gesture.Pan()
+  const scrollGesture = Gesture.Pan()
     .minPointers(2)
     .maxPointers(2)
     .onStart((e) => {
@@ -205,7 +205,45 @@ export default function Index() {
       }
     });
 
-  const doubleTapGesture = Gesture.Tap()
+  const fourFingerSwipeGesture = Gesture.Pan()
+    .minPointers(4)
+    .maxPointers(4)
+    .onEnd((e) => {
+      if (isWsConnected.value) {
+        const { translationX, translationY } = e;
+        const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe to be recognized
+
+        if (Math.abs(translationX) > Math.abs(translationY)) {
+          // Horizontal swipe on device -> Vertical space change
+          if (translationX > SWIPE_THRESHOLD) {
+            runOnJS(sendMessage)({
+              type: 'spacechange',
+              direction: 'up',
+            });
+          } else if (translationX < -SWIPE_THRESHOLD) {
+            runOnJS(sendMessage)({
+              type: 'spacechange',
+              direction: 'down',
+            });
+          }
+        } else {
+          // Vertical swipe on device -> Horizontal space change
+          if (translationY > SWIPE_THRESHOLD) {
+            runOnJS(sendMessage)({
+              type: 'spacechange',
+              direction: 'left',
+            });
+          } else if (translationY < -SWIPE_THRESHOLD) {
+            runOnJS(sendMessage)({
+              type: 'spacechange',
+              direction: 'right',
+            });
+          }
+        }
+      }
+    });
+
+  const doubleClickGesture = Gesture.Tap()
     .minPointers(3)
     .maxDuration(250)
     .maxDelay(300)
@@ -217,7 +255,7 @@ export default function Index() {
       }
     });
 
-  const singleTapGesture = Gesture.Tap()
+  const leftClickGesture = Gesture.Tap()
     .maxDuration(250)
     .maxDeltaX(5)
     .maxDeltaY(5)
@@ -229,7 +267,7 @@ export default function Index() {
       }
     });
 
-  const twoFingerTapGesture = Gesture.Tap()
+  const rightClickGesture = Gesture.Tap()
     .minPointers(2)
     .maxDuration(250)
     .maxDeltaX(10)
@@ -243,11 +281,12 @@ export default function Index() {
     });
 
   const composedGesture = Gesture.Race(
-    doubleTapGesture,
-    twoFingerTapGesture,
-    singleTapGesture,
-    panGesture,
-    twoFingerPanGesture
+    doubleClickGesture,
+    rightClickGesture,
+    leftClickGesture,
+    fourFingerSwipeGesture,
+    mouseMoveGesture,
+    scrollGesture
   );
 
   return (
