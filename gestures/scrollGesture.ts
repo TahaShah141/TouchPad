@@ -30,7 +30,7 @@ export const scrollGesture = (
         let sensitivityMultiplier = 1;
         const velocityThreshold = 500;
         const maxSensitivity = 3; // Example max sensitivity, can be adjusted
-        const sensitivityGradient = 0.002; // Small steps for linear increase
+        const sensitivityGradient = 0.001; // Small steps for linear increase
 
         if (velocity > velocityThreshold) {
           sensitivityMultiplier = 1 + (velocity - velocityThreshold) * sensitivityGradient;
