@@ -12,6 +12,8 @@ wss.on('connection', (ws) => {
   ws.on('message', (message) => {
     try {
       const data = JSON.parse(message);
+      if (data.type !== 'mousemove' && data.type !== 'scroll') 
+        console.log({type: data.type});
 
       if (data.type === 'mousemove') {
         const { dx, dy } = data;

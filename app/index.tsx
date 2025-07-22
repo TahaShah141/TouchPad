@@ -239,7 +239,20 @@ export default function Index() {
       // No action needed on end for continuous movement
     });
 
-  const composedGesture = Gesture.Simultaneous(panGesture, tapGesture, twoFingerTapGesture, twoFingerPanGesture);
+  const doubleTapGesture = Gesture.Tap()
+    .minPointers(3)
+    .maxDuration(250)
+    .maxDeltaX(5)
+    .maxDeltaY(5)
+    .onEnd(() => {
+      if (isWsConnected.value) {
+        runOnJS(sendMessage)({
+          type: 'doubleclick',
+        });
+      }
+    });
+
+  const composedGesture = Gesture.Simultaneous(panGesture, tapGesture, twoFingerTapGesture, twoFingerPanGesture, doubleTapGesture);
 
   return (
     <View className="flex-1 bg-gray-900">
