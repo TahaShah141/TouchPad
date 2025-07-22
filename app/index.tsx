@@ -1,3 +1,5 @@
+import * as ScreenOrientation from 'expo-screen-orientation';
+
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, View } from "react-native";
@@ -10,6 +12,7 @@ export default function Index() {
   const [ipAddress, setIpAddress] = useState("");
   const PORT = '2025'
   const [isConnected, setIsConnected] = useState(false);
+  const [orientation, setOrientation] = useState(ScreenOrientation.Orientation.PORTRAIT_UP);
   const isWsConnected = useSharedValue(false);
   const ws = useRef<WebSocket | null>(null);
 
@@ -55,63 +58,65 @@ export default function Index() {
   };
 
   useEffect(() => {
-    let currentWs = ws.current;
+    let currentWs = ws.current; // Capture current ref value for cleanup
 
     const setupAndConnect = async () => {
       try {
         const ip = await getMacIP();
         if (ip) {
           setIpAddress(ip);
-          console.log('IP address obtained:', ip);
 
-          console.log('Attempting to connectWebSocket...');
+          // Attempt to connect WebSocket
+          // Close existing connection before opening a new one
           if (currentWs) {
-            console.log('Closing existing WebSocket connection.');
             currentWs.close();
           }
 
-          console.log(`Initiating connection to ws://${ip}:2025`);
           const socket = new WebSocket(`ws://${ip}:2025`);
 
           socket.onopen = () => {
             setIsConnected(true);
             isWsConnected.value = true;
-            ws.current = socket;
+            ws.current = socket; // Assign here
           };
 
           socket.onmessage = (event) => {
-            console.log('Received message from server:', event.data);
           };
 
           socket.onerror = (error) => {
-            console.error('WebSocket Error during connection:', error);
-            setIsConnected(false);
+            setIsConnected(false); // Ensure state is updated on error
             isWsConnected.value = false;
-            console.log('WebSocket connection error. ws.current:', ws.current);
           };
 
           socket.onclose = () => {
             setIsConnected(false);
-            console.log('WebSocket disconnected.');
+            isWsConnected.value = false;
             ws.current = null;
-            console.log('ws.current set to null on close.');
           };
         } else {
-          console.log("Could not get IP address.");
         }
       } catch (e) {
-        console.error("Failed to get IP address or connect:", e);
       }
     };
     setupAndConnect();
 
+    // Cleanup on unmount
     return () => {
       if (currentWs) {
-        console.log('Cleaning up WebSocket on unmount.');
         currentWs.close();
       }
     };
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
+
+  useEffect(() => {
+    const subscription = ScreenOrientation.addOrientationChangeListener((event) => {
+      setOrientation(event.orientationInfo.orientation);
+    });
+
+    return () => {
+      ScreenOrientation.removeOrientationChangeListeners();
+    };
+  }, []);;
 
   const SENSITIVITY_FACTOR = 0.15; // Adjust this value as needed
 
@@ -130,20 +135,28 @@ export default function Index() {
 
   const panGesture = Gesture.Pan()
     .onStart((e) => {
+      // No action needed on start for continuous movement
     })
     .onUpdate((e) => {
       if (isWsConnected.value) {
+        let dx = e.translationX;
+        let dy = e.translationY;
+
+        // Adjust dx and dy based on current orientation
+        if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP) {
+          [dx, dy] = [dy, -dx]
+        }
 
         runOnJS(sendMessage)({
           type: 'mousemove',
-          dx: e.translationX,
-          dy: e.translationY,
+          dx: dx,
+          dy: dy,
         });
       } else {
-        console.log('WebSocket instance is null or not connected.');
       }
     })
     .onEnd(() => {
+      // No action needed on end for continuous movement
     });
 
   return (
