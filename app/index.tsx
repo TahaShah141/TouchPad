@@ -10,6 +10,7 @@ import { leftClickGesture } from '@/gestures/leftClickGesture';
 import { mouseMoveGesture } from '@/gestures/mouseMoveGesture';
 import { rightClickGesture } from '@/gestures/rightClickGesture';
 import { scrollGesture } from '@/gestures/scrollGesture';
+import { threeFingerDragGesture } from '@/gestures/threeFingerDragGesture';
 import { useWebSocket } from '@/lib/useWebSocket';
 import { sendMessageWrapper } from "@/lib/utils";
 import { MaterialIcons } from '@expo/vector-icons';
@@ -51,7 +52,8 @@ export default function Index() {
     leftClickGesture(isWsConnected, sendMessage),
     fourFingerSwipeGesture(isWsConnected, sendMessage),
     mouseMoveGesture(isWsConnected, prevPanX, prevPanY, orientation, sendMessage),
-    scrollGesture(isWsConnected, prevTwoFingerPanX, prevTwoFingerPanY, orientation, sendMessage)
+    scrollGesture(isWsConnected, prevTwoFingerPanX, prevTwoFingerPanY, orientation, sendMessage),
+    threeFingerDragGesture(isWsConnected, prevPanX, prevPanY, orientation, sendMessage)
   );
 
   return (

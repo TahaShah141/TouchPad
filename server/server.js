@@ -13,7 +13,7 @@ wss.on('connection', (ws) => {
   ws.on('message', (message) => {
     try {
       const data = JSON.parse(message);
-      if (data.type !== 'mousemove' && data.type !== 'scroll') 
+      if (data.type !== 'mousemove' && data.type !== 'scroll' && data.type !== 'threefingerdrag') 
         console.log({type: data.type});
 
       if (data.type === 'mousemove') {
@@ -21,6 +21,15 @@ wss.on('connection', (ws) => {
         if (dx === undefined || dy === undefined) return;
         const { x, y } = robot.getMousePos();
         robot.moveMouse(x + dx, y + dy);
+      } else if (data.type === 'threefingerdrag') {
+        const { dx, dy } = data;
+        if (dx === undefined || dy === undefined) return;
+        const { x, y } = robot.getMousePos();
+        robot.dragMouse(x + dx, y + dy);
+      } else if (data.type === 'mousedown') {
+        robot.mouseToggle('down', 'left');
+      } else if (data.type === 'mouseup') {
+        robot.mouseToggle('up', 'left');
       } else if (data.type === 'click') {
         robot.mouseClick();
       } else if (data.type === 'rightclick') {

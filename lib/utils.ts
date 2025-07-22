@@ -21,9 +21,13 @@ export const sendMessageWrapper = (ws: React.RefObject<WebSocket | null>) =>
     if (message.type === 'mousemove') {
       finalDx = message.dx ? message.dx * SENSITIVITY_FACTOR : undefined;
       finalDy = message.dy ? message.dy * SENSITIVITY_FACTOR : undefined;
-    } else if (message.type === 'scroll') {
+    } else if (message.type === 'scroll' || message.type === 'threefingerdrag') {
       finalDx = message.dx ? message.dx * SCROLL_SENSITIVITY_FACTOR : undefined;
       finalDy = message.dy ? message.dy * SCROLL_SENSITIVITY_FACTOR : undefined;
+    } else if (message.type === 'mousedown' || message.type === 'mouseup') {
+      // No scaling needed for mousedown/mouseup events
+      finalDx = message.dx;
+      finalDy = message.dy;
     }
 
     const scaledMessage = {
