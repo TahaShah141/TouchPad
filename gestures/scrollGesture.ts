@@ -24,6 +24,23 @@ export const scrollGesture = (
         prevTwoFingerPanX.value = e.translationX;
         prevTwoFingerPanY.value = e.translationY;
 
+        // Calculate velocity magnitude
+        const velocity = Math.sqrt(e.velocityX * e.velocityX + e.velocityY * e.velocityY);
+
+        let sensitivityMultiplier = 1;
+        const velocityThreshold = 500;
+        const maxSensitivity = 3; // Example max sensitivity, can be adjusted
+        const sensitivityGradient = 0.002; // Small steps for linear increase
+
+        if (velocity > velocityThreshold) {
+          sensitivityMultiplier = 1 + (velocity - velocityThreshold) * sensitivityGradient;
+          // Cap the sensitivity to avoid extreme values
+          sensitivityMultiplier = Math.min(sensitivityMultiplier, maxSensitivity);
+        }
+
+        dx *= sensitivityMultiplier;
+        dy *= sensitivityMultiplier;
+
         if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP) {
           [dx, dy] = [dy, -dx];
         }
