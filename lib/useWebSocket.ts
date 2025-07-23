@@ -3,13 +3,17 @@ import * as Linking from 'expo-linking';
 import { useEffect, useRef, useState } from 'react';
 
 import { getMacIP } from "@/lib/utils";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSharedValue } from 'react-native-reanimated';
+
+const WS_PORT = '2025';
+const DEVICE_OWNER_KEY = 'is_owner_key'; // Key to identify owner's device
 
 export const useWebSocket = () => {
   const [currentIp, setCurrentIp] = useState(""); // The IP currently being used for connection
   const [log, setLogState] = useState(""); // Internal state for log
+  const [requiresManualInput, setRequiresManualInput] = useState(false); // New state for UI control
   const logTimeoutRef = useRef<number | null>(null); // Ref to store timeout ID
-  const WS_PORT = '2025';
   const [isConnected, setIsConnected] = useState(false);
   const isWsConnected = useSharedValue(false);
   const ws = useRef<WebSocket | null>(null);
@@ -77,6 +81,11 @@ export const useWebSocket = () => {
     setCurrentIp(ip);
   };
 
+  // New function to set IP and connect (for manual input)
+  const setIpAndConnect = (ip: string) => {
+    setCurrentIp(ip);
+  };
+
   useEffect(() => {
     // This effect handles initial IP resolution
     if (!hasAttemptedInitialConnect.current) {
@@ -109,17 +118,23 @@ export const useWebSocket = () => {
 
     // Fallback to getMacIP if no deep link IP is set initially
     const resolveIpFallback = async () => {
-      if (!currentIp) { // Only try fallback if no IP from deep link
+      const isOwner = await AsyncStorage.getItem(DEVICE_OWNER_KEY);
+      if (isOwner === 'true') {
         try {
           const resolvedIp = await getMacIP();
           if (resolvedIp) {
             setCurrentIp(resolvedIp); // Only set IP, connection handled by next useEffect
           } else {
             setLog('Failed to get My Mac IP. Manual input may be required.');
+            setRequiresManualInput(true);
           }
         } catch (e) {
           setLog('Error during getMacIP fallback: ' + JSON.stringify(e));
+          setRequiresManualInput(true);
         }
+      } else {
+        setLog('Device not configured for automatic IP detection. Please enter manually or scan QR.');
+        setRequiresManualInput(true);
       }
     };
 
@@ -157,6 +172,9 @@ export const useWebSocket = () => {
     isWsConnected, 
     currentIp, // Expose currentIp for display
     setIpFromDeepLink, // Expose to allow external setting of IP (e.g., from UI)
+    setIpAndConnect, // Expose for manual IP input
+    requiresManualInput, // Expose to control UI rendering
+    setRequiresManualInput,
     log // Expose log for display
   };
 };

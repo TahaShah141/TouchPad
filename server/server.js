@@ -22,8 +22,8 @@ function getLocalIpAddress() {
 }
 
 const localIp = getLocalIpAddress();
-// const deepLinkUrl = `${DEEPLINK_SCHEME}://?ip=${localIp}`;
-const deepLinkUrl = `${DEEPLINK_SCHEME}://?ip=127.0.0.0`;
+const deepLinkUrl = `${DEEPLINK_SCHEME}://?ip=${localIp}`;
+// const deepLinkUrl = `${DEEPLINK_SCHEME}://?ip=127.0.0.0`;
 
 // --- WebSocket Server ---
 const wss = new WebSocket.Server({ host: HOST, port: WS_PORT });

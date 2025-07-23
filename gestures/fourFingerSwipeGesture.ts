@@ -1,9 +1,12 @@
+import * as ScreenOrientation from 'expo-screen-orientation';
+
 import { SharedValue, runOnJS } from 'react-native-reanimated';
 
 import { Gesture } from 'react-native-gesture-handler';
 
 export const fourFingerSwipeGesture = (
   isWsConnected: SharedValue<boolean>,
+  orientation: ScreenOrientation.Orientation,
   sendMessage: (message: { type: string; direction?: 'up' | 'down' | 'left' | 'right' }) => void
 ) =>
   Gesture.Pan()
@@ -19,12 +22,12 @@ export const fourFingerSwipeGesture = (
           if (translationX > SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: 'up',
+              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'up' : 'right',
             });
           } else if (translationX < -SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: 'down',
+              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'down' : 'left',
             });
           }
         } else {
@@ -32,12 +35,12 @@ export const fourFingerSwipeGesture = (
           if (translationY > SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: 'left',
+              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'left' : 'up',
             });
           } else if (translationY < -SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: 'right',
+              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'right' : 'down',
             });
           }
         }
