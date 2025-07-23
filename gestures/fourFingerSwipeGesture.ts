@@ -22,12 +22,12 @@ export const fourFingerSwipeGesture = (
           if (translationX > SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'up' : 'right',
+              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'up' : 'left',
             });
           } else if (translationX < -SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'down' : 'left',
+              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'down' : 'right',
             });
           }
         } else {
@@ -35,12 +35,12 @@ export const fourFingerSwipeGesture = (
           if (translationY > SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'left' : 'up',
+              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'left' : 'down',
             });
           } else if (translationY < -SWIPE_THRESHOLD) {
             runOnJS(sendMessage)({
               type: 'spacechange',
-              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'right' : 'down',
+              direction: orientation === ScreenOrientation.Orientation.PORTRAIT_UP ? 'right' : 'up',
             });
           }
         }
