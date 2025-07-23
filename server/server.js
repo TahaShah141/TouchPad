@@ -1,14 +1,43 @@
 const WebSocket = require('ws');
 const robot = require('robotjs');
+const os = require('os');
+const qrcode = require('qrcode');
 const { triggerMissionControl } = require('./utils');
 
 const WS_PORT = 2025;
 const HOST = '0.0.0.0';
+const DEEPLINK_SCHEME = 'touchpad'; // Your app's custom deep link scheme
 
+// Function to get local IP address
+function getLocalIpAddress() {
+  const interfaces = os.networkInterfaces();
+  for (const name in interfaces) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'localhost'; // Fallback
+}
+
+const localIp = getLocalIpAddress();
+// const deepLinkUrl = `${DEEPLINK_SCHEME}://?ip=${localIp}`;
+const deepLinkUrl = `${DEEPLINK_SCHEME}://?ip=127.0.0.0`;
+
+// --- WebSocket Server ---
 const wss = new WebSocket.Server({ host: HOST, port: WS_PORT });
 
-wss.on('listening', () => {
-  console.log(`WebSocket server is listening on ws://${HOST}:${WS_PORT}`);
+wss.on('listening', async () => {
+  console.log(`WebSocket server is listening on ws://${localIp}:${WS_PORT}`);
+  console.log('Scan the QR code below with your phone to connect:');
+  try {
+    const qrCodeAscii = await qrcode.toString(deepLinkUrl, { type: 'terminal', small: true });
+    console.log(qrCodeAscii);
+    console.log(`Or open this URL on your phone: ${deepLinkUrl}`);
+  } catch (err) {
+    console.error('Failed to generate QR code:', err);
+  }
 });
 
 wss.on('connection', (ws, req) => {

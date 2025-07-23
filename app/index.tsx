@@ -1,6 +1,5 @@
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-import { getMacIP, sendMessageWrapper } from "@/lib/utils";
 import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -14,13 +13,13 @@ import { rightClickGesture } from '@/gestures/rightClickGesture';
 import { scrollGesture } from '@/gestures/scrollGesture';
 import { threeFingerDragGesture } from '@/gestures/threeFingerDragGesture';
 import { useWebSocket } from '@/lib/useWebSocket';
+import { sendMessageWrapper } from "@/lib/utils";
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSharedValue } from 'react-native-reanimated';
 
 export default function Index() {
-  const { isConnected, connectWebSocket, ws, isWsConnected } = useWebSocket();
+  const { isConnected, connectWebSocket, ws, isWsConnected, currentIp, log } = useWebSocket();
   const [orientation, setOrientation] = useState(ScreenOrientation.Orientation.PORTRAIT_UP);
-  const [macIP, setMacIP] = useState<string | null>(null);
   const prevPanX = useSharedValue(0);
   const prevPanY = useSharedValue(0);
   const prevTwoFingerPanX = useSharedValue(0);
@@ -30,18 +29,6 @@ export default function Index() {
     const subscription = ScreenOrientation.addOrientationChangeListener((event) => {
       setOrientation(event.orientationInfo.orientation);
     });
-
-    const fetchIP = async () => {
-      try {
-        const ip = await getMacIP();
-        setMacIP(ip);
-      } catch (error) {
-        console.error("Failed to fetch Mac IP:", error);
-        setMacIP("N/A");
-      }
-    };
-
-    fetchIP();
 
     return () => {
       ScreenOrientation.removeOrientationChangeListeners();
@@ -67,6 +54,11 @@ export default function Index() {
         <View className="flex-1 m-4 rounded-3xl bg-neutral-800 shadow-lg">
         </View>
       </GestureDetector>
+
+      {log && 
+      <View className="absolute bottom-0 left-0 right-0 p-2 bg-black/30">
+        <Text className="text-white text-center text-xs font-mono">{log}</Text>
+      </View>}
       
       {/* Reconnect Button */}
       {!isConnected && (
@@ -77,7 +69,7 @@ export default function Index() {
               Connection Lost
             </Text>
             <Text className="text-neutral-400 text-center text-xs mb-4">
-              Server IP: {macIP ? macIP : "Fetching IP"}
+              Server IP: {currentIp ? currentIp : "Attempting to connect..."}
             </Text>
             <TouchableOpacity
               className="bg-neutral-700 rounded-lg py-3 px-6"

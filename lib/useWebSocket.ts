@@ -1,122 +1,162 @@
+import * as Linking from 'expo-linking';
+
 import { useEffect, useRef, useState } from 'react';
 
 import { getMacIP } from "@/lib/utils";
 import { useSharedValue } from 'react-native-reanimated';
 
 export const useWebSocket = () => {
-  const [ipAddress, setIpAddress] = useState("");
+  const [currentIp, setCurrentIp] = useState(""); // The IP currently being used for connection
+  const [log, setLogState] = useState(""); // Internal state for log
+  const logTimeoutRef = useRef<number | null>(null); // Ref to store timeout ID
   const WS_PORT = '2025';
   const [isConnected, setIsConnected] = useState(false);
   const isWsConnected = useSharedValue(false);
   const ws = useRef<WebSocket | null>(null);
+  const hasAttemptedInitialConnect = useRef(false); // New ref to track initial connection attempt
 
-  const connectWebSocket = () => {
-    console.log('Attempting to connectWebSocket...');
-    const targetIp = ipAddress;
-    
-    if (!targetIp) {
-      console.log("IP address not available yet. Cannot connect.");
+  // Custom setLog function with timeout
+  const setLog = (message: string) => {
+    setLogState(message);
+    if (logTimeoutRef.current) {
+      clearTimeout(logTimeoutRef.current);
+    }
+    logTimeoutRef.current = setTimeout(() => {
+      setLogState(""); // Clear log after 3 seconds
+    }, 3000);
+  };
+
+  const connect = (ip: string) => {
+    if (!ip) {
+      setLog("Cannot connect: IP address is empty.");
       return;
     }
 
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      console.log('Existing WebSocket connection is open. Not reconnecting.');
+      setLog('Existing WebSocket connection is open. Not reconnecting.');
       return;
     }
     
     if (ws.current && ws.current.readyState !== WebSocket.CLOSED) {
-      console.log('Closing existing WebSocket connection before new attempt.');
+      setLog('Closing existing WebSocket connection before new attempt.');
       ws.current.close();
       ws.current = null;
     }
 
-    console.log(`Initiating connection to ws://${targetIp}:${WS_PORT}`);
-    const socket = new WebSocket(`ws://${targetIp}:${WS_PORT}`);
+    setLog(`Initiating connection to ws://${ip}:${WS_PORT}`);
+    const socket = new WebSocket(`ws://${ip}:${WS_PORT}`);
 
     socket.onopen = () => {
       setIsConnected(true);
       isWsConnected.value = true;
       ws.current = socket;
-      console.log('WebSocket connected successfully.');
+      setLog('WebSocket connected successfully.');
     };
 
     socket.onmessage = (event) => {
-      console.log('Received message from server: ' + event.data);
+      setLog('Received message from server: ' + event.data);
     };
 
     socket.onerror = (error) => {
-      console.error('WebSocket Error from connectWebSocket: ' + JSON.stringify(error));
+      setLog('WebSocket Error: ' + JSON.stringify(error));
       setIsConnected(false);
       isWsConnected.value = false;
-      console.log('WebSocket connection error. ws.current state: ' + (ws.current ? ws.current.readyState : 'null'));
+      setLog('WebSocket connection error. ws.current state: ' + (ws.current ? ws.current.readyState : 'null'));
     };
 
     socket.onclose = (event) => {
       setIsConnected(false);
       isWsConnected.value = false;
       ws.current = null;
-      console.log(`WebSocket disconnected. Code: ${event.code}, Reason: ${event.reason}`);
+      setLog(`WebSocket disconnected. Code: ${event.code}, Reason: ${event.reason}`);
     };
   };
 
+  // This function only sets the IP, does not connect directly
+  const setIpFromDeepLink = (ip: string) => {
+    setCurrentIp(ip);
+  };
+
   useEffect(() => {
-    const setupAndConnect = async () => {
-      try {
-        const resolvedIp = await getMacIP();
-        if (!resolvedIp) {
-          console.log('Failed to get IP address from getMacIP().');
-          return;
+    // This effect handles initial IP resolution
+    if (!hasAttemptedInitialConnect.current) {
+      hasAttemptedInitialConnect.current = true;
+
+      // Handle initial deep link if the app was opened via one
+      Linking.getInitialURL().then((url) => {
+        if (url) {
+          const { queryParams } = Linking.parse(url);
+          if (queryParams && queryParams.ip) {
+            setCurrentIp(queryParams.ip as string); // Only set IP, connection handled by next useEffect
+          } else {
+            // If no IP in initial deep link, try fallback
+            resolveIpFallback();
+          }
+        } else {
+          // If no initial deep link, try fallback
+          resolveIpFallback();
         }
+      });
+    }
 
-        setIpAddress(resolvedIp);
-        console.log(`Resolved IP Address: ${resolvedIp}.`);
+    // Handle incoming deep links while the app is running
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      const { queryParams } = Linking.parse(url);
+      if (queryParams && queryParams.ip) {
+        setCurrentIp(queryParams.ip as string); // Only set IP, connection handled by next useEffect
+      }
+    });
 
-        if (ws.current && ws.current.readyState !== WebSocket.CLOSED) {
-          console.log('Closing existing WebSocket connection from useEffect cleanup.');
-          ws.current.close();
+    // Fallback to getMacIP if no deep link IP is set initially
+    const resolveIpFallback = async () => {
+      if (!currentIp) { // Only try fallback if no IP from deep link
+        try {
+          const resolvedIp = await getMacIP();
+          if (resolvedIp) {
+            setCurrentIp(resolvedIp); // Only set IP, connection handled by next useEffect
+          } else {
+            setLog('Failed to get My Mac IP. Manual input may be required.');
+          }
+        } catch (e) {
+          setLog('Error during getMacIP fallback: ' + JSON.stringify(e));
         }
-        
-        console.log(`Attempting initial WS connection to ${resolvedIp}:${WS_PORT}.`);
-        const socket = new WebSocket(`ws://${resolvedIp}:${WS_PORT}`);
-
-        socket.onopen = () => {
-          setIsConnected(true);
-          isWsConnected.value = true;
-          ws.current = socket;
-          console.log('Initial WebSocket connected successfully from useEffect.');
-        };
-
-        socket.onmessage = (event) => {
-          console.log('Received message from server (useEffect): ' + event.data);
-        };
-
-        socket.onerror = (error) => {
-          setIsConnected(false);
-          isWsConnected.value = false;
-          console.error('Initial WebSocket Error from useEffect: ' + JSON.stringify(error));
-          console.log('WebSocket connection error. ws.current state: ' + (ws.current ? ws.current.readyState : 'null'));
-        };
-
-        socket.onclose = (event) => {
-          setIsConnected(false);
-          isWsConnected.value = false;
-          ws.current = null;
-          console.log(`Initial WebSocket disconnected from useEffect. Code: ${event.code}, Reason: ${event.reason}`);
-        };
-      } catch (e) {
-        console.error('Error during setupAndConnect: ' + JSON.stringify(e));
       }
     };
-    
-    setupAndConnect();
 
+    // Cleanup function for this effect
+    return () => {
+      subscription.remove();
+      if (logTimeoutRef.current) {
+        clearTimeout(logTimeoutRef.current);
+      }
+    };
+  }, []); // Empty dependency array to run only once on mount
+
+  // This effect runs when currentIp changes (after initial setup or deep link update)
+  useEffect(() => {
+    if (currentIp) {
+      // This is the ONLY place where connect is called based on currentIp
+      connect(currentIp);
+    }
+  }, [currentIp]); // Re-run this effect when currentIp changes
+
+  // Cleanup for WebSocket connection on unmount
+  useEffect(() => {
     return () => {
       if (ws.current && ws.current.readyState !== WebSocket.CLOSED) {
-        console.log('Cleaning up WebSocket connection on unmount.');
+        setLog('Cleaning up WebSocket connection on unmount.');
         ws.current.close();
       }
     };
-  }, [ipAddress]);
+  }, []);
 
-  return { isConnected, connectWebSocket, ws, isWsConnected };
+  return { 
+    isConnected, 
+    connectWebSocket: () => connect(currentIp), // Expose a connect function that uses currentIp
+    ws, 
+    isWsConnected, 
+    currentIp, // Expose currentIp for display
+    setIpFromDeepLink, // Expose to allow external setting of IP (e.g., from UI)
+    log // Expose log for display
+  };
 };
