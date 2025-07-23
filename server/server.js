@@ -1,23 +1,32 @@
-
 const WebSocket = require('ws');
+const http = require('http'); // Import the http module
 const robot = require('robotjs');
 const { triggerMissionControl } = require('./utils');
 
-const wss = new WebSocket.Server({ port: 2025 });
+const WS_PORT = 2025;
+const HTTP_PORT = 8000; // Define a separate port for the HTTP server
+const HOST = '0.0.0.0'; // Listen on all available network interfaces
 
-console.log('WebSocket server started on port 2025');
+// --- WebSocket Server ---
+const wss = new WebSocket.Server({ host: HOST, port: WS_PORT });
 
-wss.on('connection', (ws) => {
-  console.log('Client connected');
+wss.on('listening', () => {
+  console.log(`WebSocket server is listening on ws://${HOST}:${WS_PORT}`);
+  console.log('Waiting for client connections...');
+});
+
+wss.on('connection', (ws, req) => {
+  const clientIp = req.socket.remoteAddress;
+  console.log(`Client connected to WebSocket from: ${clientIp}`);
 
   ws.on('message', (message) => {
     try {
-      const data = JSON.parse(message);
-      // if (data.type !== 'mousemove' && data.type !== 'scroll' && data.type !== 'threefingerdrag') 
-      //   console.log({type: data.type});
+      const data = JSON.parse(message.toString()); 
+      console.log(`Received message from ${clientIp}:`, data);
 
       if (data.type === 'echo') {
-        console.log(data.msg) 
+        console.log(`Echo message from ${clientIp}: ${data.msg}`);
+        ws.send(`Server received echo: ${data.msg}`);
       } else if (data.type === 'mousemove') {
         const { dx, dy } = data;
         if (dx === undefined || dy === undefined) return;
@@ -43,19 +52,43 @@ wss.on('connection', (ws) => {
         robot.scrollMouse(dx, dy);
       } else if (data.type === 'spacechange') {
         const { direction } = data;
-        // console.log({ direction }) 
         triggerMissionControl(direction)
       }
     } catch (error) {
-      console.error('Failed to parse message or execute action:', error);
+      console.error(`Failed to parse message or execute action from ${clientIp}:`, error);
+      ws.send(JSON.stringify({ type: 'error', message: 'Server failed to process message.' }));
     }
   });
 
-  ws.on('close', () => {
-    console.log('Client disconnected');
+  ws.on('close', (code, reason) => {
+    console.log(`Client disconnected from ${clientIp}. Code: ${code}, Reason: ${reason.toString()}`);
   });
 
   ws.on('error', (error) => {
-    console.error('WebSocket error:', error);
+    console.error(`WebSocket error for client ${clientIp}:`, error);
   });
+});
+
+wss.on('error', (error) => {
+  console.error('WebSocket server error:', error);
+});
+
+// --- HTTP Server for Connectivity Test ---
+const httpServer = http.createServer((req, res) => {
+  // Log every incoming HTTP request for debugging
+  console.log(`HTTP request received from: ${req.socket.remoteAddress} for URL: ${req.url}`);
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello from Mac Server! If you see this, basic network connectivity is working.\n');
+});
+
+httpServer.listen(HTTP_PORT, HOST, () => {
+  console.log(`HTTP server is listening on http://${HOST}:${HTTP_PORT}`);
+});
+
+httpServer.on('error', (e) => {
+  if (e.code === 'EADDRINUSE') {
+    console.error(`HTTP Port ${HTTP_PORT} is already in use. Please choose a different port or stop the other process.`);
+  } else {
+    console.error('HTTP server error:', e);
+  }
 });

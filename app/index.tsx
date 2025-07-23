@@ -18,7 +18,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useSharedValue } from 'react-native-reanimated';
 
 export default function Index() {
-  const { isConnected, connectWebSocket, ws, isWsConnected, log } = useWebSocket();
+  const { isConnected, connectWebSocket, ws, isWsConnected, log, httpTestLog, testFetch } = useWebSocket();
   const [orientation, setOrientation] = useState(ScreenOrientation.Orientation.PORTRAIT_UP);
   const [macIP, setMacIP] = useState<string | null>(null);
   const prevPanX = useSharedValue(0);
@@ -71,6 +71,10 @@ export default function Index() {
       <View className="absolute bottom-8 left-0 right-0 p-2 bg-black/30">
         <Text className="text-white text-center text-xs font-mono">{log}</Text>
       </View>
+
+      <TouchableOpacity onPress={testFetch} className="absolute bottom-20 left-0 right-0 p-2 bg-black/30">
+        <Text className="text-white text-center text-xs font-mono">{httpTestLog}</Text>
+      </TouchableOpacity>
       
       {/* Reconnect Button */}
       {!isConnected && (
