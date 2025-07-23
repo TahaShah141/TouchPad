@@ -1,18 +1,14 @@
 const WebSocket = require('ws');
-const http = require('http'); // Import the http module
 const robot = require('robotjs');
 const { triggerMissionControl } = require('./utils');
 
 const WS_PORT = 2025;
-const HTTP_PORT = 8000; // Define a separate port for the HTTP server
-const HOST = '0.0.0.0'; // Listen on all available network interfaces
+const HOST = '0.0.0.0';
 
-// --- WebSocket Server ---
 const wss = new WebSocket.Server({ host: HOST, port: WS_PORT });
 
 wss.on('listening', () => {
   console.log(`WebSocket server is listening on ws://${HOST}:${WS_PORT}`);
-  console.log('Waiting for client connections...');
 });
 
 wss.on('connection', (ws, req) => {
@@ -21,13 +17,9 @@ wss.on('connection', (ws, req) => {
 
   ws.on('message', (message) => {
     try {
-      const data = JSON.parse(message.toString()); 
-      console.log(`Received message from ${clientIp}:`, data);
+      const data = JSON.parse(message.toString());
 
-      if (data.type === 'echo') {
-        console.log(`Echo message from ${clientIp}: ${data.msg}`);
-        ws.send(`Server received echo: ${data.msg}`);
-      } else if (data.type === 'mousemove') {
+      if (data.type === 'mousemove') {
         const { dx, dy } = data;
         if (dx === undefined || dy === undefined) return;
         const { x, y } = robot.getMousePos();
@@ -56,7 +48,6 @@ wss.on('connection', (ws, req) => {
       }
     } catch (error) {
       console.error(`Failed to parse message or execute action from ${clientIp}:`, error);
-      ws.send(JSON.stringify({ type: 'error', message: 'Server failed to process message.' }));
     }
   });
 
@@ -71,24 +62,4 @@ wss.on('connection', (ws, req) => {
 
 wss.on('error', (error) => {
   console.error('WebSocket server error:', error);
-});
-
-// --- HTTP Server for Connectivity Test ---
-const httpServer = http.createServer((req, res) => {
-  // Log every incoming HTTP request for debugging
-  console.log(`HTTP request received from: ${req.socket.remoteAddress} for URL: ${req.url}`);
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Hello from Mac Server! If you see this, basic network connectivity is working.\n');
-});
-
-httpServer.listen(HTTP_PORT, HOST, () => {
-  console.log(`HTTP server is listening on http://${HOST}:${HTTP_PORT}`);
-});
-
-httpServer.on('error', (e) => {
-  if (e.code === 'EADDRINUSE') {
-    console.error(`HTTP Port ${HTTP_PORT} is already in use. Please choose a different port or stop the other process.`);
-  } else {
-    console.error('HTTP server error:', e);
-  }
 });
