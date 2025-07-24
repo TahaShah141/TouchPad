@@ -3,13 +3,22 @@ import { KeyType } from "@/lib/KEYS";
 import { MessagePayload } from "@/lib/utils";
 import { TouchableOpacity } from "react-native";
 import { handleKeyPress } from "../lib/handleKeyPress";
+import { useRouter } from 'expo-router';
 
-export const KeyboardKey = ({display, width=1, keyCode, isModifier, sendMessage}: KeyType & { sendMessage: (message: MessagePayload) => void}) => {
+export const KeyboardKey = ({display, width=1, keyCode, isModifier, sendMessage, router}: KeyType & { sendMessage: (message: MessagePayload) => void, router: ReturnType<typeof useRouter>}) => {
   const modifierContext = useModifiers();
   const isActiveModifier = isModifier && modifierContext.modifiers.get(keyCode);
 
+  const handlePress = () => {
+    if (keyCode === 'power') {
+      router.push('/');
+    } else {
+      handleKeyPress(keyCode, isModifier, sendMessage, modifierContext);
+    }
+  };
+
   return (
-    <TouchableOpacity onPress={() => handleKeyPress(keyCode, isModifier, sendMessage, modifierContext)} className={`bg-neutral-800 border h-14 rounded-md px-2 ${isActiveModifier ? 'border-white' : 'border-neutral-800'}`} style={{ aspectRatio: `${width} / 1`}} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+    <TouchableOpacity onPress={handlePress} className={`bg-neutral-800 border h-14 rounded-md px-2 ${isActiveModifier ? 'border-white' : 'border-neutral-800'}`} style={{ aspectRatio: `${width} / 1`}} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
       {display}
     </TouchableOpacity>
   )

@@ -4,9 +4,11 @@ import ArrowKeys from '@/lib/ArrowKeys';
 import { KEYS } from '@/lib/KEYS';
 import { useWebSocketContext } from '@/context/WebSocketContext';
 import { View } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function Keyboard() {
   const { sendMessage } = useWebSocketContext();
+  const router = useRouter();
 
   return (
     <ModifierProvider>
@@ -15,7 +17,7 @@ export default function Keyboard() {
           {KEYS.map((row, r) => (
             <View key={r} className='flex flex-row gap-1.5'>
               {row.map((key, i) => (
-                <KeyboardKey {...key} key={i} sendMessage={sendMessage} />
+                <KeyboardKey {...key} key={i} sendMessage={sendMessage} router={router} />
               ))}
               {r === 5 && <ArrowKeys sendMessage={sendMessage} />}
             </View>

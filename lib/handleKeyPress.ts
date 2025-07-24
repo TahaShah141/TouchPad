@@ -3,7 +3,8 @@ import { MessagePayload } from "./utils";
 interface ModifierContextProps {
   modifiers: Map<string, boolean>;
   toggleModifier: (modifierName: string) => void;
-  resetModifiers: () => void;
+  toggleAllStandardModifiers: () => void;
+  isFnActive: boolean;
 }
 
 export const handleKeyPress = (
@@ -12,14 +13,18 @@ export const handleKeyPress = (
   sendMessage: (message: MessagePayload) => void,
   modifierContext: ModifierContextProps
 ) => {
-  const { modifiers, toggleModifier, resetModifiers } = modifierContext;
+  const { modifiers, toggleModifier, toggleAllStandardModifiers, isFnActive } = modifierContext;
 
   if (isModifier) {
-    toggleModifier(keyCode);
+    if (keyCode === 'capslock') {
+      toggleAllStandardModifiers();
+    } else {
+      toggleModifier(keyCode);
+    }
   } else {
     const activeModifiers: string[] = [];
     modifiers.forEach((isActive, name) => {
-      if (isActive) {
+      if (isActive && name !== 'fn') {
         activeModifiers.push(name);
       }
     });
@@ -29,6 +34,9 @@ export const handleKeyPress = (
       keyCode,
       modifiers: activeModifiers.length > 0 ? activeModifiers : undefined,
     });
-    resetModifiers();
+
+    if (!isFnActive) {
+      // Modifiers are now reset within ModifierContext when fn is deactivated
+    }
   }
 };

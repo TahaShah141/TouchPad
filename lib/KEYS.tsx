@@ -219,6 +219,7 @@ export const KEYS: KeyType[][] = [
     {
       width: 1.8,
       keyCode: "capslock",
+      isModifier: true,
       display: (
         <View className="size-full justify-end items-start">
           <Text className="text-white text-lg pb-0.5">caps lock</Text>
