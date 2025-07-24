@@ -28,18 +28,18 @@ const functionKey = (key: string, SVG: React.FC<SvgProps>) => {
 }
 
 const functionKeys = [
-  { display: functionKey("f1", f1) },
-  { display: functionKey("f2", f2) },
-  { display: functionKey("f3", f3) },
-  { display: functionKey("f4", f4) },
-  { display: functionKey("f5", f5) },
-  { display: functionKey("f6", f6) },
-  { display: functionKey("f7", f7) },
-  { display: functionKey("f8", f8) },
-  { display: functionKey("f9", f9) },
-  { display: functionKey("f10", f10) },
-  { display: functionKey("f11", f11) },
-  { display: functionKey("f12", f12) },
+  { display: functionKey("f1", f1), keyCode: "f1" },
+  { display: functionKey("f2", f2), keyCode: "f2" },
+  { display: functionKey("f3", f3), keyCode: "f3" },
+  { display: functionKey("f4", f4), keyCode: "f4" },
+  { display: functionKey("f5", f5), keyCode: "f5" },
+  { display: functionKey("f6", f6), keyCode: "f6" },
+  { display: functionKey("f7", f7), keyCode: "f7" },
+  { display: functionKey("f8", f8), keyCode: "f8" },
+  { display: functionKey("f9", f9), keyCode: "f9" },
+  { display: functionKey("f10", f10), keyCode: "f10" },
+  { display: functionKey("f11", f11), keyCode: "f11" },
+  { display: functionKey("f12", f12), keyCode: "f12" },
 ];
 
 const stackedKey = (symbols: [string, string]) => {
@@ -62,12 +62,14 @@ const alphabetKey = (letter: string) => {
 export type KeyType = {
   width?: number
   display: React.ReactNode | string
+  keyCode: string
 }
 
 export const KEYS: KeyType[][] = [
   [
     {
       width: 1.5,
+      keyCode: "escape",
       display: (
         <View className="size-full justify-end items-start">
           <Text className="text-white text-lg pb-0.5">esc</Text>
@@ -76,6 +78,7 @@ export const KEYS: KeyType[][] = [
     },
     ...functionKeys,
     {
+      keyCode: "power",
       display: (
         <View className="py-2">
           <View className="rounded-[100%] size-full bg-[#212121]">
@@ -87,46 +90,60 @@ export const KEYS: KeyType[][] = [
   ],
   [
     {
-    display: stackedKey(['~', '`'])
+      keyCode: "`",
+      display: stackedKey(['~', '`'])
     },
     {
+      keyCode: "1",
       display: stackedKey(['!', '1'])
     },
     {
+      keyCode: "2",
       display: stackedKey(['@', '2'])
     },
     {
+      keyCode: "3",
       display: stackedKey(['#', '3'])
     },
     {
+      keyCode: "4",
       display: stackedKey(['$', '4'])
     },
     {
+      keyCode: "5",
       display: stackedKey(['%', '5'])
     },
     {
+      keyCode: "6",
       display: stackedKey(['^', '6'])
     },
     {
+      keyCode: "7",
       display: stackedKey(['&', '7'])
     },
     {
+      keyCode: "8",
       display: stackedKey(['*', '8'])
     },
     {
+      keyCode: "9",
       display: stackedKey(['(', '9'])
     },
     {
+      keyCode: "0",
       display: stackedKey([')', '0'])
     },
     {
+      keyCode: "-",
       display: stackedKey(['_', '-'])
     },
     {
+      keyCode: "=",
       display: stackedKey(['+', '='])
     },
     {
       width: 1.5,
+      keyCode: "backspace",
       display: (
         <View className="size-full justify-end items-end">
           <Text className="text-white text-lg pb-0.5">delete</Text>
@@ -137,6 +154,7 @@ export const KEYS: KeyType[][] = [
   [
     {
       width: 1.5,
+      keyCode: "tab",
       display: (
         <View className="size-full justify-end items-start">
           <Text className="text-white text-lg pb-0.5">tab</Text>
@@ -144,48 +162,62 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
+      keyCode: "q",
       display: alphabetKey("Q")
     },
     {
+      keyCode: "w",
       display: alphabetKey("W")
     },
     {
+      keyCode: "e",
       display: alphabetKey("E")
     },
     {
+      keyCode: "r",
       display: alphabetKey("R")
     },
     {
+      keyCode: "t",
       display: alphabetKey("T")
     },
     {
+      keyCode: "y",
       display: alphabetKey("Y")
     },
     {
+      keyCode: "u",
       display: alphabetKey("U")
     },
     {
+      keyCode: "i",
       display: alphabetKey("I")
     },
     {
+      keyCode: "o",
       display: alphabetKey("O")
     },
     {
+      keyCode: "p",
       display: alphabetKey("P")
     },
     {
+      keyCode: "[",
       display: stackedKey(['{', '['])
     },
     {
+      keyCode: "]",
       display: stackedKey(['}', ']'])
     },
     {
+      keyCode: "\\",
       display: stackedKey(['|', '\\'])
     }
   ],
   [
     {
       width: 1.8,
+      keyCode: "capslock",
       display: (
         <View className="size-full justify-end items-start">
           <Text className="text-white text-lg pb-0.5">caps lock</Text>
@@ -193,40 +225,52 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
+      keyCode: "a",
       display: alphabetKey("A")
     },
     {
+      keyCode: "s",
       display: alphabetKey("S")
     },
     {
+      keyCode: "d",
       display: alphabetKey("D")
     },
     {
+      keyCode: "f",
       display: alphabetKey("F")
     },
     {
+      keyCode: "g",
       display: alphabetKey("G")
     },
     {
+      keyCode: "h",
       display: alphabetKey("H")
     },
     {
+      keyCode: "j",
       display: alphabetKey("J")
     },
     {
+      keyCode: "k",
       display: alphabetKey("K")
     },
     {
+      keyCode: "l",
       display: alphabetKey("L")
     },
     {
+      keyCode: ";",
       display: stackedKey([':', ';'])
     },
     {
+      keyCode: "'",
       display: stackedKey(['"', "'"])
     },
     {
       width: 1.8,
+      keyCode: "enter",
       display: (
         <View className="size-full justify-end items-end">
           <Text className="text-white text-lg pb-0.5">return</Text>
@@ -237,6 +281,7 @@ export const KEYS: KeyType[][] = [
   [
     {
       width: 2.35,
+      keyCode: "shift",
       display: (
         <View className="size-full justify-end items-start">
           <Text className="text-white text-lg pb-0.5">shift</Text>
@@ -244,37 +289,48 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
+      keyCode: "z",
       display: alphabetKey("Z")
     },
     {
+      keyCode: "x",
       display: alphabetKey("X")
     },
     {
+      keyCode: "c",
       display: alphabetKey("C")
     },
     {
+      keyCode: "v",
       display: alphabetKey("V")
     },
     {
+      keyCode: "b",
       display: alphabetKey("B")
     },
     {
+      keyCode: "n",
       display: alphabetKey("N")
     },
     {
+      keyCode: "m",
       display: alphabetKey("M")
     },
     {
+      keyCode: ",",
       display: stackedKey(['<', ','])
     },
     {
+      keyCode: ".",
       display: stackedKey(['>', '.'])
     },
     {
+      keyCode: "/",
       display: stackedKey(['?', '/'])
     },
     {
       width: 2.35,
+      keyCode: "shift",
       display: (
         <View className="size-full justify-end items-end">
           <Text className="text-white text-lg pb-0.5">shift</Text>
@@ -284,6 +340,7 @@ export const KEYS: KeyType[][] = [
   ],
   [
     {
+      keyCode: "fn",
       display: (
         <View className="justify-between h-full py-1 pb-2">
           <Text className="text-white text-sm text-right">fn</Text> 
@@ -292,6 +349,7 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
+      keyCode: "control",
       display: (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Control width={10} height={10} />
@@ -300,6 +358,7 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
+      keyCode: "option",
       display: (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Option width={10} height={10} />
@@ -309,6 +368,7 @@ export const KEYS: KeyType[][] = [
     },
     {
       width: 1.25,
+      keyCode: "command",
       display: (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Command width={10} height={10} />
@@ -318,6 +378,7 @@ export const KEYS: KeyType[][] = [
     },
     {
       width: 5.45,
+      keyCode: "space",
       display: (
         <View className="size-full">
 
@@ -326,6 +387,7 @@ export const KEYS: KeyType[][] = [
     },
     {
       width: 1.25,
+      keyCode: "command",
       display: (
         <View className="justify-between h-full py-1 pt-2">
           <Command width={10} height={10} />
@@ -334,12 +396,13 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
+      keyCode: "option",
       display: (
         <View className="justify-between h-full py-1 pt-2">
           <Option width={10} height={10} />
           <Text className="text-white text-sm text-center">option</Text> 
         </View>
       )
-    },
+    }
   ]
 ]

@@ -74,6 +74,13 @@ wss.on('connection', (ws, req) => {
       } else if (data.type === 'spacechange') {
         const { direction } = data;
         triggerMissionControl(direction)
+      } else if (data.type === 'keyPress') {
+        const { keyCode, modifier } = data;
+        if (modifier) {
+          robot.keyTap(keyCode, modifier);
+        } else {
+          robot.keyTap(keyCode);
+        }
       }
     } catch (error) {
       console.error(`Failed to parse message or execute action from ${clientIp}:`, error);
