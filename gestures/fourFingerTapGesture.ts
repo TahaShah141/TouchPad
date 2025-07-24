@@ -2,10 +2,11 @@ import { SharedValue, runOnJS } from 'react-native-reanimated';
 
 import { Gesture } from 'react-native-gesture-handler';
 import { useRouter } from 'expo-router';
+import { MessagePayload } from '@/lib/utils';
 
 export const fourFingerTapGesture = (
   isWsConnected: SharedValue<boolean>,
-  sendMessage: (message: { type: string; msg: string }) => void,
+  sendMessage: (message: MessagePayload) => void,
   router: ReturnType<typeof useRouter>
 ) =>
   Gesture.Tap()

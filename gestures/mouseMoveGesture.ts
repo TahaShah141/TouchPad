@@ -1,13 +1,14 @@
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS, SharedValue } from 'react-native-reanimated';
 import * as ScreenOrientation from 'expo-screen-orientation';
+import { MessagePayload } from '../lib/utils';
 
 export const mouseMoveGesture = (
   isWsConnected: SharedValue<boolean>,
   prevPanX: SharedValue<number>,
   prevPanY: SharedValue<number>,
   orientation: ScreenOrientation.Orientation,
-  sendMessage: (message: { type: string; dx?: number; dy?: number; }) => void
+  sendMessage: (message: MessagePayload) => void
 ) =>
   Gesture.Pan()
     .minPointers(1)

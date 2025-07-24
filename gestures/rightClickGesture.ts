@@ -1,9 +1,10 @@
 import { Gesture } from 'react-native-gesture-handler';
 import { runOnJS, SharedValue } from 'react-native-reanimated';
+import { MessagePayload } from '../lib/utils';
 
 export const rightClickGesture = (
   isWsConnected: SharedValue<boolean>,
-  sendMessage: (message: { type: string; }) => void
+  sendMessage: (message: MessagePayload) => void
 ) =>
   Gesture.Tap()
     .minPointers(2)

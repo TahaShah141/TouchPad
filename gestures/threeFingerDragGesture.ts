@@ -3,13 +3,14 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { SharedValue, runOnJS } from 'react-native-reanimated';
 
 import { Gesture } from 'react-native-gesture-handler';
+import { MessagePayload } from '../lib/utils';
 
 export const threeFingerDragGesture = (
   isWsConnected: SharedValue<boolean>,
   prevPanX: SharedValue<number>,
   prevPanY: SharedValue<number>,
   orientation: ScreenOrientation.Orientation,
-  sendMessage: (message: { type: string; dx?: number; dy?: number; }) => void
+  sendMessage: (message: MessagePayload) => void
 ) =>
   Gesture.Pan()
     .minPointers(3)

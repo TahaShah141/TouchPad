@@ -76,6 +76,7 @@ wss.on('connection', (ws, req) => {
         triggerMissionControl(direction)
       } else if (data.type === 'keyPress') {
         const { keyCode, modifier } = data;
+        console.log({keyCode, modifier})
         if (modifier) {
           robot.keyTap(keyCode, modifier);
         } else {

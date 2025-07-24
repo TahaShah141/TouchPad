@@ -3,11 +3,12 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { SharedValue, runOnJS } from 'react-native-reanimated';
 
 import { Gesture } from 'react-native-gesture-handler';
+import { MessagePayload } from '../lib/utils';
 
 export const fourFingerSwipeGesture = (
   isWsConnected: SharedValue<boolean>,
   orientation: ScreenOrientation.Orientation,
-  sendMessage: (message: { type: string; direction?: 'up' | 'down' | 'left' | 'right' }) => void
+  sendMessage: (message: MessagePayload) => void
 ) =>
   Gesture.Pan()
     .minPointers(4)

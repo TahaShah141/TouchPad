@@ -17,7 +17,7 @@ export default function Keyboard() {
             {row.map((key, i) => (
               <KeyboardKey {...key} key={i} sendMessage={sendMessage} />
             ))}
-            {r === 5 && <ArrowKeys />}
+            {r === 5 && <ArrowKeys sendMessage={sendMessage} />}
           </View>
         ))}
       </View>

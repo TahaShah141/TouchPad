@@ -13,7 +13,7 @@ import { rightClickGesture } from '@/gestures/rightClickGesture';
 import { scrollGesture } from '@/gestures/scrollGesture';
 import { threeFingerDragGesture } from '@/gestures/threeFingerDragGesture';
 import { useWebSocket } from '@/lib/useWebSocket';
-import { sendMessageWrapper } from "@/lib/utils";
+import { sendMessageWrapper, MessagePayload } from "@/lib/utils";
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSharedValue } from 'react-native-reanimated';
