@@ -28,18 +28,18 @@ const functionKey = (key: string, SVG: React.FC<SvgProps>) => {
 }
 
 const functionKeys = [
-  { display: functionKey("f1", f1), keyCode: "f1" },
-  { display: functionKey("f2", f2), keyCode: "f2" },
+  { display: functionKey("f1", f1), keyCode: "lights_mon_down" },
+  { display: functionKey("f2", f2), keyCode: "lights_mon_up" },
   { display: functionKey("f3", f3), keyCode: "f3" },
   { display: functionKey("f4", f4), keyCode: "f4" },
   { display: functionKey("f5", f5), keyCode: "f5" },
   { display: functionKey("f6", f6), keyCode: "f6" },
-  { display: functionKey("f7", f7), keyCode: "f7" },
-  { display: functionKey("f8", f8), keyCode: "f8" },
-  { display: functionKey("f9", f9), keyCode: "f9" },
-  { display: functionKey("f10", f10), keyCode: "f10" },
-  { display: functionKey("f11", f11), keyCode: "f11" },
-  { display: functionKey("f12", f12), keyCode: "f12" },
+  { display: functionKey("f7", f7), keyCode: "audio_prev" },
+  { display: functionKey("f8", f8), keyCode: "audio_pause" },
+  { display: functionKey("f9", f9), keyCode: "audio_next" },
+  { display: functionKey("f10", f10), keyCode: "audio_mute" },
+  { display: functionKey("f11", f11), keyCode: "audio_vol_down" },
+  { display: functionKey("f12", f12), keyCode: "audio_vol_up" },
 ];
 
 const stackedKey = (symbols: [string, string]) => {

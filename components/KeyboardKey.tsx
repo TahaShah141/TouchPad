@@ -1,9 +1,9 @@
 import { useModifiers } from "@/context/ModifierContext";
 import { KeyType } from "@/lib/KEYS";
 import { MessagePayload } from "@/lib/utils";
+import { useRouter } from 'expo-router';
 import { TouchableOpacity } from "react-native";
 import { handleKeyPress } from "../lib/handleKeyPress";
-import { useRouter } from 'expo-router';
 
 export const KeyboardKey = ({display, width=1, keyCode, isModifier, sendMessage, router}: KeyType & { sendMessage: (message: MessagePayload) => void, router: ReturnType<typeof useRouter>}) => {
   const modifierContext = useModifiers();
@@ -14,7 +14,7 @@ export const KeyboardKey = ({display, width=1, keyCode, isModifier, sendMessage,
       router.push('/');
     } else {
       handleKeyPress(keyCode, isModifier, sendMessage, modifierContext);
-    }
+    }2
   };
 
   return (
