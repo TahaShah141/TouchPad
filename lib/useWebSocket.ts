@@ -2,8 +2,8 @@ import * as Linking from 'expo-linking';
 
 import { useEffect, useRef, useState } from 'react';
 
-import { getMacIP } from "@/lib/utils";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getMacIP } from "@/lib/utils";
 import { useSharedValue } from 'react-native-reanimated';
 
 const WS_PORT = '2025';
@@ -119,7 +119,7 @@ export const useWebSocket = () => {
     // Fallback to getMacIP if no deep link IP is set initially
     const resolveIpFallback = async () => {
       const isOwner = await AsyncStorage.getItem(DEVICE_OWNER_KEY);
-      if (isOwner === 'true') {
+      if (isOwner === 'true' || true) {
         try {
           const resolvedIp = await getMacIP();
           if (resolvedIp) {
@@ -133,8 +133,6 @@ export const useWebSocket = () => {
           setRequiresManualInput(true);
         }
       } else {
-        setLog('Device not configured for automatic IP detection. Please enter manually or scan QR.');
-        setRequiresManualInput(true);
       }
     };
 

@@ -15,9 +15,11 @@ import { threeFingerDragGesture } from '@/gestures/threeFingerDragGesture';
 import { useWebSocket } from '@/lib/useWebSocket';
 import { sendMessageWrapper } from "@/lib/utils";
 import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useSharedValue } from 'react-native-reanimated';
 
 export default function Index() {
+  const router = useRouter();
   const { isConnected, connectWebSocket, ws, isWsConnected, currentIp, log, requiresManualInput, setIpAndConnect, setRequiresManualInput } = useWebSocket();
   const [orientation, setOrientation] = useState(ScreenOrientation.Orientation.PORTRAIT_UP);
   const [manualIp, setManualIp] = useState("");
@@ -39,7 +41,7 @@ export default function Index() {
   const sendMessage = sendMessageWrapper(ws)
 
   const composedGesture = Gesture.Race(
-    fourFingerTapGesture(isWsConnected, sendMessage),
+    fourFingerTapGesture(isWsConnected, sendMessage, router),
     doubleClickGesture(isWsConnected, sendMessage),
     rightClickGesture(isWsConnected, sendMessage),
     leftClickGesture(isWsConnected, sendMessage),
