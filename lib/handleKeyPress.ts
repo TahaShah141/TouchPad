@@ -1,5 +1,6 @@
+import { Directions, MessagePayload } from "./utils";
+
 import { ModifierContextType } from "@/context/ModifierContext";
-import { MessagePayload } from "./utils";
 
 export const handleKeyPress = (
   keyCode: string,
@@ -23,11 +24,18 @@ export const handleKeyPress = (
       }
     });
 
-    sendMessage({
-      type: "keyPress",
-      keyCode,
-      modifiers: activeModifiers.length > 0 ? activeModifiers : undefined,
-    });
+    if (activeModifiers.length === 1 && activeModifiers[0] === 'control' && ['up', 'down', 'left', 'right'].includes(keyCode)) {
+      sendMessage({
+        type: "spacechange",
+        direction: keyCode as Directions,
+      });
+    } else {
+      sendMessage({
+        type: "keyPress",
+        keyCode,
+        modifiers: activeModifiers.length > 0 ? activeModifiers : undefined,
+      });
+    }
 
     if (!isFnActive) {
       resetAllModifiers()

@@ -12,9 +12,11 @@ export const getMacIP = async (): Promise<string> => {
 const SENSITIVITY_FACTOR = 3; // Adjust this value as needed
 const SCROLL_SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed for scrolling
 
+export type Directions = 'up' | 'down' | 'left' | 'right' 
+
 export type MessagePayload = 
   | { type: 'mousemove' | 'scroll' | 'threefingerdrag'; dx: number; dy: number }
-  | { type: 'spacechange'; direction: 'up' | 'down' | 'left' | 'right' }
+  | { type: 'spacechange'; direction: Directions}
   | { type: 'keyPress'; keyCode: string; modifiers?: string[];}
   | { type: 'mousedown' | 'mouseup' | 'click' | 'rightclick' | 'doubleclick' }
   | { type: 'echo'; msg: string }
