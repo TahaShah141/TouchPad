@@ -17,6 +17,7 @@ export const useWebSocket = () => {
   const [isWsConnected, setIsWsConnected] = useState(false);
   const ws = useRef<WebSocket | null>(null);
   const hasAttemptedInitialConnect = useRef(false); // New ref to track initial connection attempt
+  const [isOwner, setIsOwner] = useState(true)
 
   // Custom setLog function with timeout
   const setLog = (message: string) => {
@@ -118,7 +119,8 @@ export const useWebSocket = () => {
     // Fallback to getMacIP if no deep link IP is set initially
     const resolveIpFallback = async () => {
       const isOwner = await AsyncStorage.getItem(DEVICE_OWNER_KEY);
-      if (isOwner === 'true' || true) {
+      setIsOwner(isOwner === 'true')
+      if (isOwner === 'true') {
         try {
           const resolvedIp = await getMacIP();
           if (resolvedIp) {
@@ -172,6 +174,7 @@ export const useWebSocket = () => {
     setIpAndConnect, // Expose for manual IP input
     requiresManualInput, // Expose to control UI rendering
     setRequiresManualInput,
-    log // Expose log for display
+    log, // Expose log for display
+    isOwner
   };
 };

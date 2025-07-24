@@ -1,7 +1,7 @@
+import { MessagePayload, sendMessageWrapper } from '@/lib/utils';
 import React, { ReactNode, createContext, useContext } from 'react';
 
 import { useWebSocket } from '@/lib/useWebSocket';
-import { MessagePayload, sendMessageWrapper } from '@/lib/utils';
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -13,12 +13,13 @@ interface WebSocketContextType {
   requiresManualInput: boolean;
   setIpAndConnect: (ip: string) => void;
   setRequiresManualInput: (value: boolean) => void;
+  isOwner: boolean
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-  const { isConnected, connectWebSocket, ws, isWsConnected, currentIp, log, requiresManualInput, setIpAndConnect, setRequiresManualInput } = useWebSocket();
+  const { isConnected, connectWebSocket, ws, isWsConnected, currentIp, log, requiresManualInput, setIpAndConnect, setRequiresManualInput, isOwner } = useWebSocket();
   const sendMessage = sendMessageWrapper(ws);
 
   const contextValue = {
@@ -31,6 +32,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
     requiresManualInput,
     setIpAndConnect,
     setRequiresManualInput,
+    isOwner
   };
 
   return (

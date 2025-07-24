@@ -43,7 +43,6 @@ export const sendMessageWrapper = (ws: React.RefObject<WebSocket | null>) =>
         dy: finalDy,
       };
     }
-    console.log({messageToSend})
     ws.current.send(JSON.stringify(messageToSend));
   } else {
     console.log('WebSocket not open. Current state:', ws.current?.readyState);

@@ -1,10 +1,11 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+
 import { useWebSocketContext } from '@/context/WebSocketContext';
+import { MaterialIcons } from '@expo/vector-icons';
+import React from 'react';
 
 export const ConnectivityModal = () => {
-  const { isConnected, currentIp, log, requiresManualInput, setIpAndConnect, setRequiresManualInput, connectWebSocket } = useWebSocketContext();
+  const { isConnected, currentIp, log, requiresManualInput, setIpAndConnect, setRequiresManualInput, connectWebSocket, isOwner } = useWebSocketContext();
   const [manualIp, setManualIp] = React.useState("");
 
   if (isConnected) {
@@ -21,7 +22,7 @@ export const ConnectivityModal = () => {
               Connection Lost
             </Text>
             <Text className="text-neutral-400 text-center text-xs mb-4">
-              Server IP: {currentIp ? currentIp : "Attempting to connect..."}
+              Server IP: {currentIp ? currentIp : !isOwner ? "Change the IP" : "Attempting to connect..."}
             </Text>
             <View className='flex flex-row gap-4'>
               <TouchableOpacity
