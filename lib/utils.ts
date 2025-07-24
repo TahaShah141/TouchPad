@@ -15,7 +15,7 @@ const SCROLL_SENSITIVITY_FACTOR = 2.5; // Adjust this value as needed for scroll
 export type MessagePayload = 
   | { type: 'mousemove' | 'scroll' | 'threefingerdrag'; dx: number; dy: number }
   | { type: 'spacechange'; direction: 'up' | 'down' | 'left' | 'right' }
-  | { type: 'keyPress'; keyCode: string; modifier?: string }
+  | { type: 'keyPress'; keyCode: string; modifiers?: string[] }
   | { type: 'mousedown' | 'mouseup' | 'click' | 'rightclick' | 'doubleclick' }
   | { type: 'echo'; msg: string };
 

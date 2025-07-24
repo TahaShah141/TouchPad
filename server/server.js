@@ -75,10 +75,10 @@ wss.on('connection', (ws, req) => {
         const { direction } = data;
         triggerMissionControl(direction)
       } else if (data.type === 'keyPress') {
-        const { keyCode, modifier } = data;
-        console.log({keyCode, modifier})
-        if (modifier) {
-          robot.keyTap(keyCode, modifier);
+        const { keyCode, modifiers } = data;
+        console.log({keyCode, modifiers})
+        if (modifiers && modifiers.length > 0) {
+          robot.keyTap(keyCode, modifiers);
         } else {
           robot.keyTap(keyCode);
         }

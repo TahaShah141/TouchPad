@@ -63,6 +63,7 @@ export type KeyType = {
   width?: number
   display: React.ReactNode | string
   keyCode: string
+  isModifier?: boolean
 }
 
 export const KEYS: KeyType[][] = [
@@ -282,6 +283,7 @@ export const KEYS: KeyType[][] = [
     {
       width: 2.35,
       keyCode: "shift",
+      isModifier: true,
       display: (
         <View className="size-full justify-end items-start">
           <Text className="text-white text-lg pb-0.5">shift</Text>
@@ -331,6 +333,7 @@ export const KEYS: KeyType[][] = [
     {
       width: 2.35,
       keyCode: "shift",
+      isModifier: true,
       display: (
         <View className="size-full justify-end items-end">
           <Text className="text-white text-lg pb-0.5">shift</Text>
@@ -341,6 +344,7 @@ export const KEYS: KeyType[][] = [
   [
     {
       keyCode: "fn",
+      isModifier: true,
       display: (
         <View className="justify-between h-full py-1 pb-2">
           <Text className="text-white text-sm text-right">fn</Text> 
@@ -350,6 +354,7 @@ export const KEYS: KeyType[][] = [
     },
     {
       keyCode: "control",
+      isModifier: true,
       display: (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Control width={10} height={10} />
@@ -359,6 +364,7 @@ export const KEYS: KeyType[][] = [
     },
     {
       keyCode: "option",
+      isModifier: true,
       display: (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Option width={10} height={10} />
@@ -367,8 +373,9 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
-      width: 1.25,
+      width: 1.235,
       keyCode: "command",
+      isModifier: true,
       display: (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Command width={10} height={10} />
@@ -377,7 +384,7 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
-      width: 5.45,
+      width: 5.43,
       keyCode: "space",
       display: (
         <View className="size-full">
@@ -386,8 +393,9 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
-      width: 1.25,
+      width: 1.235,
       keyCode: "command",
+      isModifier: true,
       display: (
         <View className="justify-between h-full py-1 pt-2">
           <Command width={10} height={10} />
@@ -397,6 +405,7 @@ export const KEYS: KeyType[][] = [
     },
     {
       keyCode: "option",
+      isModifier: true,
       display: (
         <View className="justify-between h-full py-1 pt-2">
           <Option width={10} height={10} />

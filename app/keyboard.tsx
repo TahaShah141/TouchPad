@@ -1,4 +1,5 @@
 import { KeyboardKey } from '@/components/KeyboardKey';
+import { ModifierProvider } from '@/context/ModifierContext';
 import ArrowKeys from '@/lib/ArrowKeys';
 import { KEYS } from '@/lib/KEYS';
 import { useWebSocket } from '@/lib/useWebSocket';
@@ -10,17 +11,19 @@ export default function Keyboard() {
   const sendMessage = sendMessageWrapper(ws);
 
   return (
-    <View className='flex-1 bg-neutral-900 justify-center items-center'>
-      <View className='gap-1.5 portrait:rotate-90'>
-        {KEYS.map((row, r) => (
-          <View key={r} className='flex flex-row gap-1.5'>
-            {row.map((key, i) => (
-              <KeyboardKey {...key} key={i} sendMessage={sendMessage} />
-            ))}
-            {r === 5 && <ArrowKeys sendMessage={sendMessage} />}
-          </View>
-        ))}
+    <ModifierProvider>
+      <View className='flex-1 bg-neutral-900 justify-center items-center'>
+        <View className='gap-1.5 portrait:rotate-90'>
+          {KEYS.map((row, r) => (
+            <View key={r} className='flex flex-row gap-1.5'>
+              {row.map((key, i) => (
+                <KeyboardKey {...key} key={i} sendMessage={sendMessage} />
+              ))}
+              {r === 5 && <ArrowKeys sendMessage={sendMessage} />}
+            </View>
+          ))}
+        </View>
       </View>
-    </View>
+    </ModifierProvider>
   );
 }
