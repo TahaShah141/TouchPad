@@ -5,8 +5,9 @@ import { useWebSocketContext } from '@/context/WebSocketContext';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import { twoFingerSwipeDeleteGesture } from '@/gestures/twoFingerSwipeDeleteGesture';
+import { fourFingerSwipeEditsGesture } from '@/gestures/fourFingerSwipeEditsGesture';
 import { threeFingerSwipeAppSwitchGesture } from '@/gestures/threeFingerSwipeAppSwitchGesture';
+import { twoFingerSwipeArrowsGesture } from '@/gestures/twoFingerSwipeArrowsGesture';
 import * as ScreenOrientation from "expo-screen-orientation";
 import { useEffect, useState } from 'react';
 
@@ -25,10 +26,11 @@ export default function Keyboard() {
     };
   }, []);
 
-  const twoFingerDelete = twoFingerSwipeDeleteGesture(orientation);
+  const fourFingerEdits = fourFingerSwipeEditsGesture(orientation);
   const threeFingerAppSwitch = threeFingerSwipeAppSwitchGesture(orientation);
+  const twoFingerArrows = twoFingerSwipeArrowsGesture(orientation);
 
-  const combinedGestures = Gesture.Simultaneous(twoFingerDelete, threeFingerAppSwitch);
+  const combinedGestures = Gesture.Simultaneous(fourFingerEdits, threeFingerAppSwitch, twoFingerArrows);
 
   return (
     <GestureDetector gesture={combinedGestures}>

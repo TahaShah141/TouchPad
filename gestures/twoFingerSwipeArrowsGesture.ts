@@ -4,7 +4,7 @@ import { useWebSocketContext } from "@/context/WebSocketContext";
 import { Gesture } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
 
-export const twoFingerSwipeDeleteGesture = (orientation: ScreenOrientation.Orientation) => {
+export const twoFingerSwipeArrowsGesture = (orientation: ScreenOrientation.Orientation) => {
   const { isWsConnected, sendMessage } = useWebSocketContext();
   return Gesture.Pan()
     .minPointers(2)
@@ -19,7 +19,6 @@ export const twoFingerSwipeDeleteGesture = (orientation: ScreenOrientation.Orien
 
         // Adjust movements based on orientation
         if (orientation === ScreenOrientation.Orientation.PORTRAIT_UP || orientation === ScreenOrientation.Orientation.PORTRAIT_DOWN) {
-          // In portrait, device's X is app's Y, and device's Y is app's X (but inverted for X)
           horizontalMovement = translationY;
           verticalMovement = -translationX; // Invert X for vertical movement
         }
@@ -30,30 +29,28 @@ export const twoFingerSwipeDeleteGesture = (orientation: ScreenOrientation.Orien
             // Swiped left
             runOnJS(sendMessage)({
               type: "keyPress",
-              keyCode: "backspace",
+              keyCode: "left",
             });
           } else if (horizontalMovement > SWIPE_THRESHOLD) {
             // Swiped right
             runOnJS(sendMessage)({
               type: "keyPress",
-              keyCode: "delete",
+              keyCode: "right",
             });
           }
         } else {
           // Vertical swipe
           if (verticalMovement < -SWIPE_THRESHOLD) {
-            // Swiped up (Redo: Command + Shift + Z)
+            // Swiped up
             runOnJS(sendMessage)({
               type: "keyPress",
-              keyCode: "z",
-              modifiers: ["command", "shift"],
+              keyCode: "up",
             });
           } else if (verticalMovement > SWIPE_THRESHOLD) {
-            // Swiped down (Undo: Command + Z)
+            // Swiped down
             runOnJS(sendMessage)({
               type: "keyPress",
-              keyCode: "z",
-              modifiers: ["command"],
+              keyCode: "down",
             });
           }
         }
