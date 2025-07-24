@@ -21,6 +21,13 @@ function getLocalIpAddress() {
   return "localhost"; // Fallback
 }
 
+const TapAndReset = (keyCode, modifiers) => {
+  robot.keyTap(keyCode, modifiers)
+  setTimeout(() => modifiers.forEach(mod => {
+    robot.keyTap(mod)
+  }), 200)
+}
+
 const localIp = getLocalIpAddress();
 const deepLinkUrl = `${DEEPLINK_SCHEME}://?ip=${localIp}`;
 // const deepLinkUrl = `${DEEPLINK_SCHEME}://?ip=127.0.0.0`;
@@ -56,40 +63,74 @@ wss.on("connection", (ws, req) => {
         if (dx === undefined || dy === undefined) return;
         const { x, y } = robot.getMousePos();
         robot.moveMouse(x + dx, y + dy);
-      } else if (data.type === "threefingerdrag") {
+      } 
+      else if (data.type === "threefingerdrag") {
         const { dx, dy } = data;
         if (dx === undefined || dy === undefined) return;
         const { x, y } = robot.getMousePos();
         robot.dragMouse(x + dx, y + dy);
-      } else if (data.type === "mousedown") {
+      } 
+      else if (data.type === "mousedown") {
         robot.mouseToggle("down", "left");
-      } else if (data.type === "mouseup") {
+      } 
+      else if (data.type === "mouseup") {
         robot.mouseToggle("up", "left");
-      } else if (data.type === "click") {
+      } 
+      else if (data.type === "click") {
         robot.mouseClick();
-      } else if (data.type === "rightclick") {
+      } 
+      else if (data.type === "rightclick") {
         robot.mouseClick("right");
-      } else if (data.type === "doubleclick") {
+      } 
+      else if (data.type === "doubleclick") {
         robot.mouseClick("left", true);
-      } else if (data.type === "scroll") {
+      } 
+      else if (data.type === "scroll") {
         const { dx, dy } = data;
         robot.scrollMouse(dx, dy);
-      } else if (data.type === "spacechange") {
+      } 
+      else if (data.type === "spacechange") {
         const { direction } = data;
         triggerMissionControl(direction);
-      } else if (data.type === "keyPress") {
-        const { keyCode, modifiers, reset } = data;
+      } 
+      else if (data.type === "keyPress") {
+        const { keyCode, modifiers } = data;
         console.log({ keyCode, modifiers });
         if (modifiers && modifiers.length > 0) {
           robot.keyTap(keyCode, modifiers);
-          console.log({reset})
-          if (reset) {
-            setTimeout(() => modifiers.forEach(mod => {
-              robot.keyTap(mod);
-            }), [200]);
-          }
         } else {
           robot.keyTap(keyCode);
+        }
+      }
+      else if (data.type === "custom") {
+        const { name } = data
+        switch (name) {
+          case "lineStart":
+            TapAndReset("left", ["command"])
+            break;
+          case "lineEnd":
+            TapAndReset("right", ["command"]);
+            break;
+          case "redo":
+            TapAndReset("z", ["command", "shift"]);
+            break;
+          case "undo":
+            TapAndReset("z", ["command"]);
+            break;
+          case "nextTab":
+            TapAndReset("tab", ["control"]);
+            break;
+          case "prevTab":
+            TapAndReset("tab", ["control", "shift"]);
+            break;
+          case "nextApp":
+            TapAndReset("tab", ["command"]);
+            break;
+          case "prevApp":
+            TapAndReset("tab", ["command", "shift"]);
+            break;
+          default:
+            console.log(`Unknown custom command: ${name}`);
         }
       }
     } catch (error) {

@@ -34,16 +34,14 @@ export const fourFingerSwipeEditsGesture = (
           if (horizontalMovement < -SWIPE_THRESHOLD) {
             // Swiped left
             runOnJS(sendMessage)({
-              type: "keyPress",
-              keyCode: "left",
-              modifiers: ["command"],
+              type: "custom",
+              name: "lineStart",
             });
           } else if (horizontalMovement > SWIPE_THRESHOLD) {
             // Swiped right
             runOnJS(sendMessage)({
-              type: "keyPress",
-              keyCode: "right",
-              modifiers: ["command"],
+              type: "custom",
+              name: "lineEnd",
             });
           }
         } else {
@@ -51,16 +49,14 @@ export const fourFingerSwipeEditsGesture = (
           if (verticalMovement < -SWIPE_THRESHOLD) {
             // Swiped up (Redo: Command + Shift + Z)
             runOnJS(sendMessage)({
-              type: "keyPress",
-              keyCode: "z",
-              modifiers: ["command", "shift"],
+              type: "custom",
+              name: "redo",
             });
           } else if (verticalMovement > SWIPE_THRESHOLD) {
             // Swiped down (Undo: Command + Z)
             runOnJS(sendMessage)({
-              type: "keyPress",
-              keyCode: "z",
-              modifiers: ["command"],
+              type: "custom",
+              name: "undo",
             });
           }
         }

@@ -28,18 +28,14 @@ export const threeFingerSwipeAppSwitchGesture = (orientation: ScreenOrientation.
           if (horizontalMovement < -SWIPE_THRESHOLD) {
             // Swiped left
             runOnJS(sendMessage)({
-              type: "keyPress",
-              keyCode: "tab",
-              modifiers: ["control"],
-              reset: true
+              type: "custom",
+              name: "nextTab",
             });
           } else if (horizontalMovement > SWIPE_THRESHOLD) {
             // Swiped right
             runOnJS(sendMessage)({
-              type: "keyPress",
-              keyCode: "tab",
-              modifiers: ["control", "shift"],
-              reset: true
+              type: "custom",
+              name: "prevTab",
             });
           }
         } else {
@@ -47,18 +43,14 @@ export const threeFingerSwipeAppSwitchGesture = (orientation: ScreenOrientation.
           if (verticalMovement < -SWIPE_THRESHOLD) {
             // Swiped up
             runOnJS(sendMessage)({
-              type: "keyPress",
-              keyCode: "tab",
-              modifiers: ["command"],
-              reset: true
+              type: "custom",
+              name: "nextApp",
             });
           } else if (verticalMovement > SWIPE_THRESHOLD) {
             // Swiped down
             runOnJS(sendMessage)({
-              type: "keyPress",
-              keyCode: "tab",
-              modifiers: ["command", "shift"],
-              reset: true
+              type: "custom",
+              name: "prevApp",
             });
           }
         }
