@@ -364,7 +364,7 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
-      keyCode: "option",
+      keyCode: "alt",
       isModifier: true,
       display: (
         <View className="justify-between h-full py-1 pt-2 items-end">
@@ -405,7 +405,7 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
-      keyCode: "option",
+      keyCode: "alt",
       isModifier: true,
       display: (
         <View className="justify-between h-full py-1 pt-2">

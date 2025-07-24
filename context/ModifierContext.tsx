@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
+import React, { ReactNode, createContext, useContext, useMemo, useState } from 'react';
 
-interface ModifierContextType {
+export interface ModifierContextType {
   modifiers: Map<string, boolean>;
+  resetAllModifiers: () => void
   toggleModifier: (modifierName: string) => void;
-  toggleAllStandardModifiers: () => void;
+  toggleAllStandardModifiers: (newState :boolean) => void;
   isFnActive: boolean;
 }
 
@@ -29,25 +30,30 @@ export const ModifierProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const toggleAllStandardModifiers = () => {
+  const toggleAllStandardModifiers = (newState: boolean) => {
     setModifiers((prev) => {
       const newMap = new Map(prev);
-      const standardModifiers = ['command', 'control', 'option', 'shift'];
+      const standardModifiers = ['command', 'control', 'alt', 'shift'];
       standardModifiers.forEach(mod => {
-        newMap.set(mod, !newMap.get(mod));
+        newMap.set(mod, newState);
       });
       return newMap;
     });
   };
 
+  const resetAllModifiers = () => {
+    setModifiers(new Map())
+  }
+
   const contextValue = useMemo(
     () => ({
       modifiers,
+      resetAllModifiers,
       toggleModifier,
       toggleAllStandardModifiers,
       isFnActive,
     }),
-    [modifiers, toggleModifier, toggleAllStandardModifiers, isFnActive]
+    [modifiers, resetAllModifiers, toggleModifier, toggleAllStandardModifiers, isFnActive]
   );
 
   return (
