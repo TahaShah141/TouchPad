@@ -1,41 +1,42 @@
-import * as ScreenOrientation from 'expo-screen-orientation';
+import * as ScreenOrientation from "expo-screen-orientation";
 
-import { SharedValue, runOnJS } from 'react-native-reanimated';
+import { SharedValue, runOnJS } from "react-native-reanimated";
 
-import { Gesture } from 'react-native-gesture-handler';
-import { MessagePayload } from '../lib/utils';
+import { useWebSocketContext } from "@/context/WebSocketContext";
+import { Gesture } from "react-native-gesture-handler";
 
 export const threeFingerDragGesture = (
-  isWsConnected: SharedValue<boolean>,
   prevPanX: SharedValue<number>,
   prevPanY: SharedValue<number>,
-  orientation: ScreenOrientation.Orientation,
-  sendMessage: (message: MessagePayload) => void
-) =>
-  Gesture.Pan()
+  orientation: ScreenOrientation.Orientation
+) => {
+  const { isWsConnected, sendMessage } = useWebSocketContext();
+  return Gesture.Pan()
     .minPointers(3)
     .maxPointers(3)
-    .onStart((e) => {
+    .onStart(e => {
       prevPanX.value = e.translationX;
       prevPanY.value = e.translationY;
       runOnJS(sendMessage)({
-        type: 'mousedown',
+        type: "mousedown",
       });
     })
     .onEnd(() => {
       runOnJS(sendMessage)({
-        type: 'mouseup',
+        type: "mouseup",
       });
     })
-    .onUpdate((e) => {
-      if (isWsConnected.value) {
+    .onUpdate(e => {
+      if (isWsConnected) {
         let dx = e.translationX - prevPanX.value;
         let dy = e.translationY - prevPanY.value;
 
         prevPanX.value = e.translationX;
         prevPanY.value = e.translationY;
 
-        const velocity = Math.sqrt(e.velocityX * e.velocityX + e.velocityY * e.velocityY);
+        const velocity = Math.sqrt(
+          e.velocityX * e.velocityX + e.velocityY * e.velocityY
+        );
 
         let sensitivityMultiplier = 1;
         const lowVelocityThreshold = 200;
@@ -46,11 +47,19 @@ export const threeFingerDragGesture = (
         const highSensitivityGradient = 0.001; // Small steps for linear increase
 
         if (velocity < lowVelocityThreshold) {
-          sensitivityMultiplier = 1 - (lowVelocityThreshold - velocity) * lowSensitivityGradient;
-          sensitivityMultiplier = Math.max(sensitivityMultiplier, minSensitivity);
+          sensitivityMultiplier =
+            1 - (lowVelocityThreshold - velocity) * lowSensitivityGradient;
+          sensitivityMultiplier = Math.max(
+            sensitivityMultiplier,
+            minSensitivity
+          );
         } else if (velocity > highVelocityThreshold) {
-          sensitivityMultiplier = 1 + (velocity - highVelocityThreshold) * highSensitivityGradient;
-          sensitivityMultiplier = Math.min(sensitivityMultiplier, maxSensitivity);
+          sensitivityMultiplier =
+            1 + (velocity - highVelocityThreshold) * highSensitivityGradient;
+          sensitivityMultiplier = Math.min(
+            sensitivityMultiplier,
+            maxSensitivity
+          );
         }
 
         dx *= sensitivityMultiplier;
@@ -61,9 +70,10 @@ export const threeFingerDragGesture = (
         }
 
         runOnJS(sendMessage)({
-          type: 'threefingerdrag',
+          type: "threefingerdrag",
           dx: dx,
           dy: dy,
         });
       }
     });
+};

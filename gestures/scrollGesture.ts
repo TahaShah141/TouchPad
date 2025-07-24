@@ -1,16 +1,17 @@
-import { Gesture } from 'react-native-gesture-handler';
-import { runOnJS, SharedValue } from 'react-native-reanimated';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { MessagePayload } from '../lib/utils';
+
+import { SharedValue, runOnJS } from 'react-native-reanimated';
+
+import { useWebSocketContext } from '@/context/WebSocketContext';
+import { Gesture } from 'react-native-gesture-handler';
 
 export const scrollGesture = (
-  isWsConnected: SharedValue<boolean>,
   prevTwoFingerPanX: SharedValue<number>,
   prevTwoFingerPanY: SharedValue<number>,
-  orientation: ScreenOrientation.Orientation,
-  sendMessage: (message: MessagePayload) => void
-) =>
-  Gesture.Pan()
+  orientation: ScreenOrientation.Orientation
+) => {
+  const { isWsConnected, sendMessage } = useWebSocketContext();
+  return Gesture.Pan()
     .minPointers(2)
     .maxPointers(2)
     .onStart((e) => {
@@ -18,7 +19,7 @@ export const scrollGesture = (
       prevTwoFingerPanY.value = e.translationY;
     })
     .onUpdate((e) => {
-      if (isWsConnected.value) {
+      if (isWsConnected) {
         let dx = e.translationX - prevTwoFingerPanX.value;
         let dy = e.translationY - prevTwoFingerPanY.value;
 
@@ -53,3 +54,4 @@ export const scrollGesture = (
         });
       }
     });
+  }

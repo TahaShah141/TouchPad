@@ -2,9 +2,8 @@ import * as Linking from 'expo-linking';
 
 import { useEffect, useRef, useState } from 'react';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMacIP } from "@/lib/utils";
-import { useSharedValue } from 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const WS_PORT = '2025';
 const DEVICE_OWNER_KEY = 'is_owner_key'; // Key to identify owner's device
@@ -15,7 +14,7 @@ export const useWebSocket = () => {
   const [requiresManualInput, setRequiresManualInput] = useState(false); // New state for UI control
   const logTimeoutRef = useRef<number | null>(null); // Ref to store timeout ID
   const [isConnected, setIsConnected] = useState(false);
-  const isWsConnected = useSharedValue(false);
+  const [isWsConnected, setIsWsConnected] = useState(false);
   const ws = useRef<WebSocket | null>(null);
   const hasAttemptedInitialConnect = useRef(false); // New ref to track initial connection attempt
 
@@ -25,9 +24,9 @@ export const useWebSocket = () => {
     if (logTimeoutRef.current) {
       clearTimeout(logTimeoutRef.current);
     }
-    logTimeoutRef.current = setTimeout(() => {
+    logTimeoutRef.current = +(setTimeout(() => {
       setLogState(""); // Clear log after 3 seconds
-    }, 3000);
+    }, 3000));
   };
 
   const connect = (ip: string) => {
@@ -52,7 +51,7 @@ export const useWebSocket = () => {
 
     socket.onopen = () => {
       setIsConnected(true);
-      isWsConnected.value = true;
+      setIsWsConnected(true)
       ws.current = socket;
       setLog('WebSocket connected successfully.');
     };
@@ -64,13 +63,13 @@ export const useWebSocket = () => {
     socket.onerror = (error) => {
       setLog('WebSocket Error: ' + JSON.stringify(error));
       setIsConnected(false);
-      isWsConnected.value = false;
+      setIsWsConnected(false)
       setLog('WebSocket connection error. ws.current state: ' + (ws.current ? ws.current.readyState : 'null'));
     };
 
     socket.onclose = (event) => {
       setIsConnected(false);
-      isWsConnected.value = false;
+      setIsWsConnected(false)
       ws.current = null;
       setLog(`WebSocket disconnected. Code: ${event.code}, Reason: ${event.reason}`);
     };

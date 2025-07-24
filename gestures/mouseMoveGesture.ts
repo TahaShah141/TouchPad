@@ -1,31 +1,34 @@
-import { Gesture } from 'react-native-gesture-handler';
-import { runOnJS, SharedValue } from 'react-native-reanimated';
-import * as ScreenOrientation from 'expo-screen-orientation';
-import { MessagePayload } from '../lib/utils';
+import * as ScreenOrientation from "expo-screen-orientation";
+
+import { SharedValue, runOnJS } from "react-native-reanimated";
+
+import { useWebSocketContext } from "@/context/WebSocketContext";
+import { Gesture } from "react-native-gesture-handler";
 
 export const mouseMoveGesture = (
-  isWsConnected: SharedValue<boolean>,
   prevPanX: SharedValue<number>,
   prevPanY: SharedValue<number>,
-  orientation: ScreenOrientation.Orientation,
-  sendMessage: (message: MessagePayload) => void
-) =>
-  Gesture.Pan()
+  orientation: ScreenOrientation.Orientation
+) => {
+  const { isWsConnected, sendMessage } = useWebSocketContext();
+  return Gesture.Pan()
     .minPointers(1)
     .maxPointers(1)
-    .onStart((e) => {
+    .onStart(e => {
       prevPanX.value = e.translationX;
       prevPanY.value = e.translationY;
     })
-    .onUpdate((e) => {
-      if (isWsConnected.value) {
+    .onUpdate(e => {
+      if (isWsConnected) {
         let dx = e.translationX - prevPanX.value;
         let dy = e.translationY - prevPanY.value;
 
         prevPanX.value = e.translationX;
         prevPanY.value = e.translationY;
 
-        const velocity = Math.sqrt(e.velocityX * e.velocityX + e.velocityY * e.velocityY);
+        const velocity = Math.sqrt(
+          e.velocityX * e.velocityX + e.velocityY * e.velocityY
+        );
 
         let sensitivityMultiplier = 1;
         const lowVelocityThreshold = 200;
@@ -36,11 +39,19 @@ export const mouseMoveGesture = (
         const highSensitivityGradient = 0.001; // Small steps for linear increase
 
         if (velocity < lowVelocityThreshold) {
-          sensitivityMultiplier = 1 - (lowVelocityThreshold - velocity) * lowSensitivityGradient;
-          sensitivityMultiplier = Math.max(sensitivityMultiplier, minSensitivity);
+          sensitivityMultiplier =
+            1 - (lowVelocityThreshold - velocity) * lowSensitivityGradient;
+          sensitivityMultiplier = Math.max(
+            sensitivityMultiplier,
+            minSensitivity
+          );
         } else if (velocity > highVelocityThreshold) {
-          sensitivityMultiplier = 1 + (velocity - highVelocityThreshold) * highSensitivityGradient;
-          sensitivityMultiplier = Math.min(sensitivityMultiplier, maxSensitivity);
+          sensitivityMultiplier =
+            1 + (velocity - highVelocityThreshold) * highSensitivityGradient;
+          sensitivityMultiplier = Math.min(
+            sensitivityMultiplier,
+            maxSensitivity
+          );
         }
 
         dx *= sensitivityMultiplier;
@@ -51,9 +62,10 @@ export const mouseMoveGesture = (
         }
 
         runOnJS(sendMessage)({
-          type: 'mousemove',
+          type: "mousemove",
           dx: dx,
           dy: dy,
         });
       }
     });
+};

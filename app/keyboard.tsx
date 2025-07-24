@@ -2,13 +2,11 @@ import { KeyboardKey } from '@/components/KeyboardKey';
 import { ModifierProvider } from '@/context/ModifierContext';
 import ArrowKeys from '@/lib/ArrowKeys';
 import { KEYS } from '@/lib/KEYS';
-import { useWebSocket } from '@/lib/useWebSocket';
-import { sendMessageWrapper } from '@/lib/utils';
+import { useWebSocketContext } from '@/context/WebSocketContext';
 import { View } from 'react-native';
 
 export default function Keyboard() {
-  const { ws } = useWebSocket();
-  const sendMessage = sendMessageWrapper(ws);
+  const { sendMessage } = useWebSocketContext();
 
   return (
     <ModifierProvider>

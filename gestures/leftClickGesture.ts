@@ -1,19 +1,19 @@
-import { Gesture } from 'react-native-gesture-handler';
-import { runOnJS, SharedValue } from 'react-native-reanimated';
-import { MessagePayload } from '../lib/utils';
+import { runOnJS } from "react-native-reanimated";
 
-export const leftClickGesture = (
-  isWsConnected: SharedValue<boolean>,
-  sendMessage: (message: MessagePayload) => void
-) =>
-  Gesture.Tap()
+import { useWebSocketContext } from "@/context/WebSocketContext";
+import { Gesture } from "react-native-gesture-handler";
+
+export const leftClickGesture = () => {
+  const { isWsConnected, sendMessage } = useWebSocketContext();
+  return Gesture.Tap()
     .maxDuration(250)
     .maxDeltaX(5)
     .maxDeltaY(5)
     .onEnd(() => {
-      if (isWsConnected.value) {
+      if (isWsConnected) {
         runOnJS(sendMessage)({
-          type: 'click',
+          type: "click",
         });
       }
     });
+};
