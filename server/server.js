@@ -96,7 +96,11 @@ wss.on("connection", (ws, req) => {
       } 
       else if (data.type === "spacechange") {
         const { direction } = data;
-        triggerMissionControl(direction);
+        if (os.platform() === 'darwin') {
+          triggerMissionControl(direction);
+        } else {
+          // Configure your way to switch spaces
+        }
       } 
       else if (data.type === "keyPress") {
         const { keyCode, modifiers } = data;
@@ -109,30 +113,39 @@ wss.on("connection", (ws, req) => {
       }
       else if (data.type === "custom") {
         const { name } = data
+        const isMac = os.platform() === 'darwin'
         switch (name) {
           case "lineStart":
-            TapAndReset("left", ["command"])
+            if (isMac) TapAndReset("left", ["command"]);
+            else TapAndReset("home");
             break;
           case "lineEnd":
-            TapAndReset("right", ["command"]);
+            if (isMac) TapAndReset("right", ["command"]);
+            else TapAndReset("end");
             break;
           case "redo":
-            TapAndReset("z", ["command", "shift"]);
+            if (isMac) TapAndReset("z", ["command", "shift"]);
+            else TapAndReset("y", ["control"]);
             break;
           case "undo":
-            TapAndReset("z", ["command"]);
+            if (isMac) TapAndReset("z", ["command"]);
+            else TapAndReset("z", ["control"]);
             break;
           case "nextTab":
-            TapAndReset("tab", ["control"]);
+            if (isMac) TapAndReset("tab", ["control"]);
+            else TapAndReset("tab", ["control"]);
             break;
           case "prevTab":
-            TapAndReset("tab", ["control", "shift"]);
+            if (isMac) TapAndReset("tab", ["control", "shift"]);
+            else TapAndReset("tab", ["control", "shift"]);
             break;
           case "nextApp":
-            TapAndReset("tab", ["command"]);
+            if (isMac) TapAndReset("tab", ["command"]);
+            else TapAndReset("tab", ["alt"]);
             break;
           case "prevApp":
-            TapAndReset("tab", ["command", "shift"]);
+            if (isMac) TapAndReset("tab", ["command", "shift"]);
+            else TapAndReset("tab", ["alt", "shift"]);
             break;
           default:
             console.log(`Unknown custom command: ${name}`);
