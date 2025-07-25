@@ -3,8 +3,9 @@ const robot = require("robotjs");
 const os = require("os");
 const qrcode = require("qrcode");
 const { triggerMissionControl } = require("./utils");
+const { exec } = require('child_process');;
 
-const WS_PORT = 2025;
+const WS_PORT = 1301;
 const HOST = "0.0.0.0";
 const DEEPLINK_SCHEME = "touchpad"; // Your app's custom deep link scheme
 
@@ -109,6 +110,13 @@ wss.on("connection", (ws, req) => {
           robot.keyTap(keyCode, modifiers);
         } else {
           robot.keyTap(keyCode);
+        }
+      }
+      else if (data.type === "link") {
+        const { url } = data
+        if (url) {
+          const command = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
+          exec(`${command} "${url}"`);
         }
       }
       else if (data.type === "custom") {

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMacIP } from "@/lib/utils";
 
-const WS_PORT = '2025';
+const WS_PORT = '1301';
 const DEVICE_OWNER_KEY = 'is_owner_key'; // Key to identify owner's device
 
 export const useWebSocket = () => {
@@ -126,7 +126,7 @@ export const useWebSocket = () => {
     const resolveIpFallback = async () => {
       const isOwner = await AsyncStorage.getItem(DEVICE_OWNER_KEY);
       setIsOwner(isOwner === 'true')
-      if (isOwner === 'true' || true) {
+      if (isOwner === 'true') {
         try {
           const resolvedIp = await getMacIP();
           if (resolvedIp) {
