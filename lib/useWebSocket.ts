@@ -2,8 +2,8 @@ import * as Linking from 'expo-linking';
 
 import { useEffect, useRef, useState } from 'react';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMacIP } from "@/lib/utils";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const WS_PORT = '1301';
 const DEVICE_OWNER_KEY = 'is_owner_key'; // Key to identify owner's device
@@ -77,6 +77,7 @@ export const useWebSocket = () => {
     socket.onclose = (event) => {
       setIsConnected(false);
       setIsWsConnected(false)
+      setRequiresManualInput(false)
       ws.current = null;
       setLog(`WebSocket disconnected. Code: ${event.code}, Reason: ${event.reason}`);
     };

@@ -1,11 +1,5 @@
-import { Text, View } from "react-native";
-
 import Command from '@/assets/keys/command.svg';
 import Control from '@/assets/keys/control.svg';
-import Globe from '@/assets/keys/globe.svg';
-import Option from '@/assets/keys/option.svg';
-import { SvgProps } from "react-native-svg";
-import Windows from '@/assets/keys/windows.svg';
 import f1 from '@/assets/keys/f1.svg';
 import f10 from '@/assets/keys/f10.svg';
 import f11 from '@/assets/keys/f11.svg';
@@ -18,12 +12,18 @@ import f6 from '@/assets/keys/f6.svg';
 import f7 from '@/assets/keys/f7.svg';
 import f8 from '@/assets/keys/f8.svg';
 import f9 from '@/assets/keys/f9.svg';
+import Globe from '@/assets/keys/globe.svg';
+import Option from '@/assets/keys/option.svg';
+import Windows from '@/assets/keys/windows.svg';
+import { ThemedText } from '@/components/ThemedText';
+import { View } from "react-native";
+import { SvgProps } from "react-native-svg";
 
 const functionKey = (key: string, SVG: React.FC<SvgProps>) => {
   return (
     <View className="justify-between h-full pt-3 pb-1 items-center">
       <SVG width={12} height={12} />
-      <Text className="text-white uppercase text-sm">{key}</Text> 
+      <ThemedText className="text-white uppercase text-sm">{key}</ThemedText> 
     </View>
   )
 }
@@ -46,8 +46,8 @@ const functionKeys = [
 const stackedKey = (symbols: [string, string]) => {
   return (
     <View className="justify-between h-full py-1 items-center">
-      <Text className="text-white uppercase text-lg">{symbols[0]}</Text> 
-      <Text className="text-white uppercase text-lg">{symbols[1]}</Text> 
+      <ThemedText className="text-white uppercase text-lg">{symbols[0]}</ThemedText> 
+      <ThemedText className="text-white uppercase text-lg">{symbols[1]}</ThemedText> 
     </View>
   )
 }
@@ -55,7 +55,7 @@ const stackedKey = (symbols: [string, string]) => {
 const alphabetKey = (letter: string) => {
   return (
     <View className="h-full justify-center items-center py-2">
-      <Text className="text-white uppercase text-lg">{letter}</Text> 
+      <ThemedText className="text-white uppercase text-lg">{letter}</ThemedText> 
     </View>
   )
 }
@@ -74,7 +74,7 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       keyCode: "escape",
       display: (
         <View className="size-full justify-end items-start">
-          <Text className="text-white text-lg pb-0.5">esc</Text>
+          <ThemedText className="text-white text-lg pb-0.5">esc</ThemedText>
         </View>
       )
     },
@@ -148,7 +148,7 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       keyCode: "backspace",
       display: (
         <View className="size-full justify-end items-end">
-          <Text className="text-white text-lg pb-0.5">delete</Text>
+          <ThemedText className="text-white text-lg pb-0.5">delete</ThemedText>
         </View>
       )
     },
@@ -159,7 +159,7 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       keyCode: "tab",
       display: (
         <View className="size-full justify-end items-start">
-          <Text className="text-white text-lg pb-0.5">tab</Text>
+          <ThemedText className="text-white text-lg pb-0.5">tab</ThemedText>
         </View>
       )
     },
@@ -223,7 +223,7 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       isModifier: true,
       display: (
         <View className="size-full justify-end items-start">
-          <Text className="text-white text-lg pb-0.5">caps lock</Text>
+          <ThemedText className="text-white text-lg pb-0.5">caps lock</ThemedText>
         </View>
       )
     },
@@ -276,7 +276,7 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       keyCode: "enter",
       display: (
         <View className="size-full justify-end items-end">
-          <Text className="text-white text-lg pb-0.5">return</Text>
+          <ThemedText className="text-white text-lg pb-0.5">return</ThemedText>
         </View>
       )
     },
@@ -288,7 +288,7 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       isModifier: true,
       display: (
         <View className="size-full justify-end items-start">
-          <Text className="text-white text-lg pb-0.5">shift</Text>
+          <ThemedText className="text-white text-lg pb-0.5">shift</ThemedText>
         </View>
       )
     },
@@ -338,7 +338,7 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       isModifier: true,
       display: (
         <View className="size-full justify-end items-end">
-          <Text className="text-white text-lg pb-0.5">shift</Text>
+          <ThemedText className="text-white text-lg pb-0.5">shift</ThemedText>
         </View>
       )
     },
@@ -351,12 +351,12 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       isModifier: true,
       display: isMac ? (
         <View className="justify-between h-full py-1 pb-2">
-          <Text className="text-white text-sm text-right">fn</Text> 
+          <ThemedText className="text-white text-sm text-right">fn</ThemedText> 
           <Globe width={10} height={10} />
         </View>
       ) : (
         <View className="justify-center items-center h-full py-1">
-          <Text className="text-white text-sm">Fn</Text> 
+          <ThemedText className="text-white text-sm">Fn</ThemedText> 
         </View>
       )
     },
@@ -367,11 +367,11 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       display: isMac ? (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Control width={10} height={10} />
-          <Text className="text-white text-sm text-center">control</Text> 
+          <ThemedText className="text-white text-sm text-center">control</ThemedText> 
         </View>
       ) : (
         <View className="justify-center items-center h-full py-1">
-          <Text className="text-white text-sm">Ctrl</Text> 
+          <ThemedText className="text-white text-sm">Ctrl</ThemedText> 
         </View>
       )
     },
@@ -382,7 +382,7 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       display: isMac ? (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Option width={10} height={10} />
-          <Text className="text-white text-sm text-center">option</Text> 
+          <ThemedText className="text-white text-sm text-center">option</ThemedText> 
         </View>
       ) : (
         <View className="justify-center items-center h-full py-1">
@@ -397,11 +397,11 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       display: isMac ? (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Command width={10} height={10} />
-          <Text className="text-white text-sm text-center">command</Text> 
+          <ThemedText className="text-white text-sm text-center">command</ThemedText> 
         </View>
       ) : (
         <View className="justify-center items-center h-full py-1">
-          <Text className="text-white text-sm">Alt</Text> 
+          <ThemedText className="text-white text-sm">Alt</ThemedText> 
         </View>
       )
     },
@@ -421,11 +421,11 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       display: isMac ? (
         <View className="justify-between h-full py-1 pt-2">
           <Command width={10} height={10} />
-          <Text className="text-white text-sm text-center">command</Text> 
+          <ThemedText className="text-white text-sm text-center">command</ThemedText> 
         </View>
       ) : (
         <View className="justify-center items-center h-full py-1">
-          <Text className="text-white text-sm">Alt</Text> 
+          <ThemedText className="text-white text-sm">Alt</ThemedText> 
         </View>
       )
     },
@@ -436,11 +436,11 @@ export const KEYS = (isMac: boolean): KeyType[][] => [
       display: isMac ? (
         <View className="justify-between h-full py-1 pt-2">
           <Option width={10} height={10} />
-          <Text className="text-white text-sm text-center">option</Text> 
+          <ThemedText className="text-white text-sm text-center">option</ThemedText> 
         </View>
       ) : (
         <View className="justify-center items-center h-full py-1">
-          <Text className="text-white text-sm">Ctrl</Text> 
+          <ThemedText className="text-white text-sm">Ctrl</ThemedText> 
         </View>
       )
     }
