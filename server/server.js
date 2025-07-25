@@ -1,5 +1,5 @@
 const WebSocket = require("ws");
-const robot = require("robotjs");
+const robot = require("@hurdlegroup/robotjs");
 const os = require("os");
 const qrcode = require("qrcode");
 const { triggerMissionControl } = require("./utils");
