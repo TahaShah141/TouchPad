@@ -2,8 +2,8 @@ import * as Linking from 'expo-linking';
 
 import { useEffect, useRef, useState } from 'react';
 
-import { getMacIP } from "@/lib/utils";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getMacIP } from "@/lib/utils";
 
 const WS_PORT = '2025';
 const DEVICE_OWNER_KEY = 'is_owner_key'; // Key to identify owner's device
@@ -18,6 +18,7 @@ export const useWebSocket = () => {
   const ws = useRef<WebSocket | null>(null);
   const hasAttemptedInitialConnect = useRef(false); // New ref to track initial connection attempt
   const [isOwner, setIsOwner] = useState(true)
+  const [isMac, setIsMac] = useState(false);
 
   // Custom setLog function with timeout
   const setLog = (message: string) => {
@@ -58,7 +59,12 @@ export const useWebSocket = () => {
     };
 
     socket.onmessage = (event) => {
-      setLog('Received message from server: ' + event.data);
+      const message = JSON.parse(event.data);
+      if (message.type === 'os_info') {
+        setIsMac(message.isMac);
+      } else {
+        setLog('Received message from server: ' + event.data);
+      }
     };
 
     socket.onerror = (error) => {
@@ -120,7 +126,7 @@ export const useWebSocket = () => {
     const resolveIpFallback = async () => {
       const isOwner = await AsyncStorage.getItem(DEVICE_OWNER_KEY);
       setIsOwner(isOwner === 'true')
-      if (isOwner === 'true') {
+      if (isOwner === 'true' || true) {
         try {
           const resolvedIp = await getMacIP();
           if (resolvedIp) {
@@ -175,6 +181,7 @@ export const useWebSocket = () => {
     requiresManualInput, // Expose to control UI rendering
     setRequiresManualInput,
     log, // Expose log for display
-    isOwner
+    isOwner,
+    isMac
   };
 };

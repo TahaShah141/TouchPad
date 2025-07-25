@@ -2,6 +2,10 @@ import { Text, View } from "react-native";
 
 import Command from '@/assets/keys/command.svg';
 import Control from '@/assets/keys/control.svg';
+import Globe from '@/assets/keys/globe.svg';
+import Option from '@/assets/keys/option.svg';
+import { SvgProps } from "react-native-svg";
+import Windows from '@/assets/keys/windows.svg';
 import f1 from '@/assets/keys/f1.svg';
 import f10 from '@/assets/keys/f10.svg';
 import f11 from '@/assets/keys/f11.svg';
@@ -14,9 +18,6 @@ import f6 from '@/assets/keys/f6.svg';
 import f7 from '@/assets/keys/f7.svg';
 import f8 from '@/assets/keys/f8.svg';
 import f9 from '@/assets/keys/f9.svg';
-import Globe from '@/assets/keys/globe.svg';
-import Option from '@/assets/keys/option.svg';
-import { SvgProps } from "react-native-svg";
 
 const functionKey = (key: string, SVG: React.FC<SvgProps>) => {
   return (
@@ -66,7 +67,7 @@ export type KeyType = {
   isModifier?: boolean
 }
 
-export const KEYS: KeyType[][] = [
+export const KEYS = (isMac: boolean): KeyType[][] => [
   [
     {
       width: 1.5,
@@ -342,45 +343,65 @@ export const KEYS: KeyType[][] = [
       )
     },
   ],
+  //Last Row
   [
     {
+      width: isMac ? 1 : 1.05875,
       keyCode: "fn",
       isModifier: true,
-      display: (
+      display: isMac ? (
         <View className="justify-between h-full py-1 pb-2">
           <Text className="text-white text-sm text-right">fn</Text> 
           <Globe width={10} height={10} />
         </View>
+      ) : (
+        <View className="justify-center items-center h-full py-1">
+          <Text className="text-white text-sm">Fn</Text> 
+        </View>
       )
     },
     {
+      width: isMac ? 1 : 1.05875,
       keyCode: "control",
       isModifier: true,
-      display: (
+      display: isMac ? (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Control width={10} height={10} />
           <Text className="text-white text-sm text-center">control</Text> 
         </View>
-      )
-    },
-    {
-      keyCode: "alt",
-      isModifier: true,
-      display: (
-        <View className="justify-between h-full py-1 pt-2 items-end">
-          <Option width={10} height={10} />
-          <Text className="text-white text-sm text-center">option</Text> 
+      ) : (
+        <View className="justify-center items-center h-full py-1">
+          <Text className="text-white text-sm">Ctrl</Text> 
         </View>
       )
     },
     {
-      width: 1.235,
-      keyCode: "command",
+      width: isMac ? 1 : 1.05875,
+      keyCode: isMac ? "alt" : "home",
       isModifier: true,
-      display: (
+      display: isMac ? (
+        <View className="justify-between h-full py-1 pt-2 items-end">
+          <Option width={10} height={10} />
+          <Text className="text-white text-sm text-center">option</Text> 
+        </View>
+      ) : (
+        <View className="justify-center items-center h-full py-1">
+          <Windows width={25} height={25} />
+        </View>
+      )
+    },
+    {
+      width: isMac ? 1.235 : 1.05875,
+      keyCode: isMac ? "command" : "alt",
+      isModifier: true,
+      display: isMac ? (
         <View className="justify-between h-full py-1 pt-2 items-end">
           <Command width={10} height={10} />
           <Text className="text-white text-sm text-center">command</Text> 
+        </View>
+      ) : (
+        <View className="justify-center items-center h-full py-1">
+          <Text className="text-white text-sm">Alt</Text> 
         </View>
       )
     },
@@ -394,23 +415,32 @@ export const KEYS: KeyType[][] = [
       )
     },
     {
-      width: 1.235,
-      keyCode: "command",
+      width: isMac ? 1.235 : 1.1175,
+      keyCode: isMac ? "command" : "alt",
       isModifier: true,
-      display: (
+      display: isMac ? (
         <View className="justify-between h-full py-1 pt-2">
           <Command width={10} height={10} />
           <Text className="text-white text-sm text-center">command</Text> 
         </View>
+      ) : (
+        <View className="justify-center items-center h-full py-1">
+          <Text className="text-white text-sm">Alt</Text> 
+        </View>
       )
     },
     {
-      keyCode: "alt",
+      width: isMac ? 1 : 1.1175,
+      keyCode: isMac ? "alt" : "control",
       isModifier: true,
-      display: (
+      display: isMac ? (
         <View className="justify-between h-full py-1 pt-2">
           <Option width={10} height={10} />
           <Text className="text-white text-sm text-center">option</Text> 
+        </View>
+      ) : (
+        <View className="justify-center items-center h-full py-1">
+          <Text className="text-white text-sm">Ctrl</Text> 
         </View>
       )
     }

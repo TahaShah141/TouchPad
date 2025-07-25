@@ -54,6 +54,11 @@ wss.on("connection", (ws, req) => {
   const clientIp = req.socket.remoteAddress;
   console.log(`Client connected to WebSocket from: ${clientIp}`);
 
+  // Send OS info on connection
+  const isMac = os.platform() === "darwin";
+  console.log("Your Operating System:", os.platform())
+  ws.send(JSON.stringify({ type: "os_info", isMac }));
+
   ws.on("message", message => {
     try {
       const data = JSON.parse(message.toString());

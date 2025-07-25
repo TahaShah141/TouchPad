@@ -13,13 +13,14 @@ interface WebSocketContextType {
   requiresManualInput: boolean;
   setIpAndConnect: (ip: string) => void;
   setRequiresManualInput: (value: boolean) => void;
-  isOwner: boolean
+  isOwner: boolean;
+  isMac: boolean;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-  const { isConnected, connectWebSocket, ws, isWsConnected, currentIp, log, requiresManualInput, setIpAndConnect, setRequiresManualInput, isOwner } = useWebSocket();
+  const { isConnected, connectWebSocket, ws, isWsConnected, currentIp, log, requiresManualInput, setIpAndConnect, setRequiresManualInput, isOwner, isMac } = useWebSocket();
   const sendMessage = sendMessageWrapper(ws);
 
   const contextValue = {
@@ -32,7 +33,8 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
     requiresManualInput,
     setIpAndConnect,
     setRequiresManualInput,
-    isOwner
+    isOwner,
+    isMac
   };
 
   return (

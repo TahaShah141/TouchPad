@@ -1,18 +1,20 @@
-import { KeyboardKey } from '@/components/KeyboardKey';
+import * as ScreenOrientation from "expo-screen-orientation";
+
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { useEffect, useState } from 'react';
+
 import ArrowKeys from '@/lib/ArrowKeys';
 import { KEYS } from '@/lib/KEYS';
-import { useWebSocketContext } from '@/context/WebSocketContext';
+import { KeyboardKey } from '@/components/KeyboardKey';
 import { View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { fourFingerSwipeEditsGesture } from '@/gestures/fourFingerSwipeEditsGesture';
 import { threeFingerSwipeAppSwitchGesture } from '@/gestures/threeFingerSwipeAppSwitchGesture';
 import { twoFingerSwipeArrowsGesture } from '@/gestures/twoFingerSwipeArrowsGesture';
-import * as ScreenOrientation from "expo-screen-orientation";
-import { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useWebSocketContext } from '@/context/WebSocketContext';
 
 export default function Keyboard() {
-  const { sendMessage } = useWebSocketContext();
+  const { sendMessage, isMac } = useWebSocketContext();
   const router = useRouter();
   const [orientation, setOrientation] = useState<ScreenOrientation.Orientation>(ScreenOrientation.Orientation.PORTRAIT_UP);
 
@@ -36,7 +38,7 @@ export default function Keyboard() {
     <GestureDetector gesture={combinedGestures}>
       <View className='flex-1 bg-neutral-900 justify-center items-center'>
         <View className='gap-1.5 portrait:rotate-90'>
-          {KEYS.map((row, r) => (
+          {KEYS(isMac).map((row, r) => (
             <View key={r} className='flex flex-row gap-1.5'>
               {row.map((key, i) => (
                 <KeyboardKey {...key} key={i} sendMessage={sendMessage} router={router} />
