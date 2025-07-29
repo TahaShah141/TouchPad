@@ -13,6 +13,10 @@ Before you begin, ensure you have the following installed:
 1.  **Start the server:**
     - Open your terminal.
     - Navigate to the `server` directory within the project folder.
+    - Install dependencies by running:
+      ```bash
+      npm install
+      ```
     - Run the following command to start the server:
       ```bash
       node server.js
@@ -51,14 +55,6 @@ Before you begin, ensure you have the following installed:
 -   **Four-finger swipe:** Editing controls (e.g., undo, redo)
 
 #### You can change these around if you want inside the server file itself
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm run reset-project`
-
-This command moves the starter code to the `app-example` directory and creates a blank `app` directory where you can start developing.
 
 ## Learn more
 

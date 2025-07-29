@@ -2,13 +2,41 @@ const WebSocket = require("ws");
 const robot = require("@hurdlegroup/robotjs");
 const os = require("os");
 const qrcode = require("qrcode");
-const { triggerMissionControl } = require("./utils");
 const { exec } = require('child_process');;
 
+// --- MISSION CONTROL ---
+const directionKeyCodes = {
+  up: 126,
+  down: 125,
+  left: 123,
+  right: 124
+};
+
+const triggerMissionControl = (direction) => {
+  const keyCode = directionKeyCodes[direction.toLowerCase()];
+  if (!keyCode) {
+    throw new Error(`Invalid direction: ${direction}. Use "up", "down", "left", or "right".`);
+  }
+
+  const script = `tell application "System Events" to key code ${keyCode} using control down`;
+  exec(`osascript -e '${script}'`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error triggering Mission Control: ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`osascript stderr: ${stderr}`);
+      return;
+    }
+  });
+}
+
+// --- CONFIG ---
 const WS_PORT = 1301;
 const HOST = "0.0.0.0";
-const DEEPLINK_SCHEME = "touchpad"; // Your app's custom deep link scheme
+const DEEPLINK_SCHEME = "touchpad";
 
+// --- HELPERS ---
 // Function to get local IP address
 function getLocalIpAddress() {
   const interfaces = os.networkInterfaces();
